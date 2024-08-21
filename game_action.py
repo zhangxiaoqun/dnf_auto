@@ -549,7 +549,8 @@ class GameAction:
                     #     # self.ctrl.click(2161, 126)
                     #     # 选择其他地下城页面-战斗开始 按钮
                     #     self.ctrl.click(1925, 925)
-                    if find_best_match(current_screen_img, r"./img/pl_num_file/pl300.jpg") is not None:
+                    # if find_best_match(current_screen_img, r"./img/pl_num_file/pl300.jpg") is not None:
+                    if find_best_match(current_screen_img, r"./img/ruchang.jpg") is not None:
                         # enter_xy = find_best_match(current_screen_img, r"./img/pl_num_file/pl300.jpg")
                         # 点击入场
                         # click_img_coordinate(self.ctrl, current_screen_img, r"./img/ruchang.jpg")
