@@ -20,8 +20,9 @@ def click_img_coordinate(control, current_screen_img, image_path):
     return False
 
 
-def bwj(control):
-    current_screen_img = "./current_screen_img.jpg"
+current_screen_img = "./current_screen_img.jpg"
+def repair_equipment(control):
+    # current_screen_img = "./current_screen_img.jpg"
     time.sleep(5)
     # 获取当前页面截图
     print("获取当前页面图片")
@@ -37,13 +38,15 @@ def bwj(control):
     # 点击修理
     click_img_coordinate(control, current_screen_img, r"./img/repair_file/xiuli_2.jpg")
     print("修理完成")
-
     # time.sleep(2)
     control.click(152, 39)
     print("点击返回")
     time.sleep(3)
     control.click(152, 39)
     print("点击返回")
+
+
+def bwj(control):
     time.sleep(3)
     # 点击冒险
     control.click(2072, 984)
@@ -281,82 +284,82 @@ class GameAction:
         last_angle = 0
 
 
-        heros = [r"./img/role/nai1.jpg", r"./img/role/bie2.jpg", r"./img/role/bie2.jpg"]
-        current_screen_img = "./current_screen_img.jpg"
-        # 选择其他地下城
-        # self.ctrl.click(2078, 240)
-        # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/select_dxc.jpg")
-        print("选择其他地下城")
-        take_screenshot()
-        time.sleep(7)
-        if find_best_match(current_screen_img, r"./img/pl_num_file/pl0.jpg"):
-            print("选择角色中")
-            # 点击右上角X按钮
-            self.ctrl.click(2053, 136)
-            # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/X_icon.jpg")
-            print("点击右上角X按钮")
-            # 点击左上角返回
-            self.ctrl.click(149, 37)
-            # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/return_icon.jpg")
-            print("点击左上角返回按钮")
-            # 点击返回城镇
-            self.ctrl.click(2064, 338)
-            # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/return_city.jpg")
-            print("点击返回城镇")
-            time.sleep(10)
-            # 选择角色 （刷图的角色顺序）
-            hero_num = 0
-            if hero_num == 0:
-                time.sleep(1)
-                # 左上角选角
-                click_img_coordinate(self.ctrl, current_screen_img, r"./img/role/xuanjiao.jpg")
-                print("点击左上角选角")
-                # 获取当前屏幕信息并点击坐标
-                click_img_coordinate(self.ctrl, current_screen_img, heros[0])
-                hero_num = hero_num + 1
-                print("角色切换成功")
-                bwj(self.ctrl)
-                print("执行布万家前置步骤，1.修理装备 2.进入地图")
-                # 启动脚本
-                self.stop_event = False
-                print("点击run 按钮")
-                print(f"我是英雄：{hero_num}")
-        else:
-            # 选择其他地下城页面-战斗开始 按钮
-            time.sleep(3)
-            print("==============================")
-            print("点击-战斗开始")
-            print("==============================")
-            self.ctrl.click(1925, 925)
-            # 判断确定是否再次挑战布万加地图
-            time.sleep(2)
-            take_screenshot()
-            time.sleep(2)
-            # if find_best_match("./current.jpg", r"./img/buwanjia.jpg"):
-            # if find_best_match(current_screen_img, r"./img/buwanjia.jpg"):
-            #     # 勾选
-            #     self.ctrl.click(1021, 555)
-            #     time.sleep(0.5)
-            #     # 点击确认
-            #     self.ctrl.click(1337, 693)
-            #     time.sleep(1)
-            #     # 点击重新挑战
-            #     # self.ctrl.click(2161, 126)
-            #     # 选择其他地下城页面-战斗开始 按钮
-            #     self.ctrl.click(1925, 925)
-            if find_best_match(current_screen_img, r"./img/pl_num_file/pl300.jpg") is not None:
-                # enter_xy = find_best_match(current_screen_img, r"./img/pl_num_file/pl300.jpg")
-                # 点击入场
-                # click_img_coordinate(self.ctrl, current_screen_img, r"./img/ruchang.jpg")
-                self.ctrl.click(1342, 700)
-                # time.sleep(2)
-                # self.ctrl.click(enter_xy[0], enter_xy[1])
-                print("疲劳超过300-点击入场")
-        self.detect_retry = False
-        self.room_num = 0
-        time.sleep(3)
-        hero_track = deque()
-        hero_track.appendleft([0, 0])
+        # heros = [r"./img/role/nai1.jpg", r"./img/role/bie2.jpg", r"./img/role/bie2.jpg"]
+        # current_screen_img = "./current_screen_img.jpg"
+        # # 选择其他地下城
+        # # self.ctrl.click(2078, 240)
+        # # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/select_dxc.jpg")
+        # print("选择其他地下城")
+        # take_screenshot()
+        # time.sleep(7)
+        # if find_best_match(current_screen_img, r"./img/pl_num_file/pl0.jpg"):
+        #     print("选择角色中")
+        #     # 点击右上角X按钮
+        #     self.ctrl.click(2053, 136)
+        #     # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/X_icon.jpg")
+        #     print("点击右上角X按钮")
+        #     # 点击左上角返回
+        #     self.ctrl.click(149, 37)
+        #     # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/return_icon.jpg")
+        #     print("点击左上角返回按钮")
+        #     # 点击返回城镇
+        #     self.ctrl.click(2064, 338)
+        #     # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/return_city.jpg")
+        #     print("点击返回城镇")
+        #     time.sleep(10)
+        #     # 选择角色 （刷图的角色顺序）
+        #     hero_num = 0
+        #     if hero_num == 0:
+        #         time.sleep(1)
+        #         # 左上角选角
+        #         click_img_coordinate(self.ctrl, current_screen_img, r"./img/role/xuanjiao.jpg")
+        #         print("点击左上角选角")
+        #         # 获取当前屏幕信息并点击坐标
+        #         click_img_coordinate(self.ctrl, current_screen_img, heros[0])
+        #         hero_num = hero_num + 1
+        #         print("角色切换成功")
+        #         bwj(self.ctrl)
+        #         print("执行布万家前置步骤，1.修理装备 2.进入地图")
+        #         # 启动脚本
+        #         self.stop_event = False
+        #         print("点击run 按钮")
+        #         print(f"我是英雄：{hero_num}")
+        # else:
+        #     # 选择其他地下城页面-战斗开始 按钮
+        #     time.sleep(3)
+        #     print("==============================")
+        #     print("点击-战斗开始")
+        #     print("==============================")
+        #     self.ctrl.click(1925, 925)
+        #     # 判断确定是否再次挑战布万加地图
+        #     time.sleep(2)
+        #     take_screenshot()
+        #     time.sleep(2)
+        #     # if find_best_match("./current.jpg", r"./img/buwanjia.jpg"):
+        #     # if find_best_match(current_screen_img, r"./img/buwanjia.jpg"):
+        #     #     # 勾选
+        #     #     self.ctrl.click(1021, 555)
+        #     #     time.sleep(0.5)
+        #     #     # 点击确认
+        #     #     self.ctrl.click(1337, 693)
+        #     #     time.sleep(1)
+        #     #     # 点击重新挑战
+        #     #     # self.ctrl.click(2161, 126)
+        #     #     # 选择其他地下城页面-战斗开始 按钮
+        #     #     self.ctrl.click(1925, 925)
+        #     if find_best_match(current_screen_img, r"./img/pl_num_file/pl300.jpg") is not None:
+        #         # enter_xy = find_best_match(current_screen_img, r"./img/pl_num_file/pl300.jpg")
+        #         # 点击入场
+        #         # click_img_coordinate(self.ctrl, current_screen_img, r"./img/ruchang.jpg")
+        #         self.ctrl.click(1342, 700)
+        #         # time.sleep(2)
+        #         # self.ctrl.click(enter_xy[0], enter_xy[1])
+        #         print("疲劳超过300-点击入场")
+        # self.detect_retry = False
+        # self.room_num = 0
+        # time.sleep(3)
+        # hero_track = deque()
+        # hero_track.appendleft([0, 0])
 
 
 
@@ -444,7 +447,7 @@ class GameAction:
                 # self.ctrl.click(2161, 126)
 
 
-                heros = [r"./img/role/nai1.jpg", r"./img/role/bie2.jpg", r"./img/role/bie2.jpg"]
+                heros = [r"./img/role/nai1.jpg", r"./img/role/bie2.jpg", r"./img/role/kuang3.jpg"]
                 current_screen_img = "./current_screen_img.jpg"
                 # 选择其他地下城
                 self.ctrl.click(2078, 240)
@@ -468,7 +471,7 @@ class GameAction:
                     print("点击返回城镇")
                     time.sleep(10)
                     # 选择角色 （刷图的角色顺序）
-                    hero_num = 0
+                    hero_num = 2
                     if hero_num == 0:
                         time.sleep(1)
                         # 左上角选角
@@ -478,6 +481,9 @@ class GameAction:
                         click_img_coordinate(self.ctrl, current_screen_img, heros[0])
                         hero_num = hero_num + 1
                         print("角色切换成功")
+                        # 修理装备
+                        repair_equipment(self.ctrl)
+                        # 进布万加地图
                         bwj(self.ctrl)
                         print("执行布万家前置步骤，1.修理装备 2.进入地图")
                         # 启动脚本
@@ -485,32 +491,41 @@ class GameAction:
                         print("点击run 按钮")
                         print(f"我是英雄：{hero_num}")
                     elif hero_num == 1:
-                        take_screenshot()
-                        print("左上角选角")
-                        hero_center_coordinates = find_best_match(current_screen_img, heros[1])
-                        if hero_center_coordinates is not None:
-                            zuobiao = hero_center_coordinates
-                            time.sleep(1)
-                            # 点击角色名称
-                            self.ctrl.click(zuobiao[0], zuobiao[1])
-                            hero_num = hero_num + 1
-                            bwj(self.ctrl)
-                            # 启动脚本
-                            self.stop_event = False
-                            print("点击run 按钮")
+                        time.sleep(1)
+                        # 左上角选角
+                        click_img_coordinate(self.ctrl, current_screen_img, r"./img/role/xuanjiao.jpg")
+                        print("点击左上角选角")
+                        # 获取当前屏幕信息并点击坐标
+                        click_img_coordinate(self.ctrl, current_screen_img, heros[1])
+                        hero_num = hero_num + 1
+                        print("角色切换成功")
+                        # 修理装备
+                        repair_equipment(self.ctrl)
+                        # 进布万加地图
+                        bwj(self.ctrl)
+                        print("执行布万家前置步骤，1.修理装备 2.进入地图")
+                        # 启动脚本
+                        self.stop_event = False
+                        print("点击run 按钮")
+                        print(f"我是英雄：{hero_num}")
                     elif hero_num == 2:
-                        take_screenshot()
-                        hero_center_coordinates = find_best_match(current_screen_img, heros[2])
-                        if hero_center_coordinates is not None:
-                            zuobiao = hero_center_coordinates
-                            time.sleep(1)
-                            # 点击角色名称
-                            self.ctrl.click(zuobiao[0], zuobiao[1])
-                            hero_num = hero_num + 1
-                            bwj(self.ctrl)
-                            # 启动脚本
-                            self.stop_event = False
-                            print("点击run 按钮")
+                        time.sleep(1)
+                        # 左上角选角
+                        click_img_coordinate(self.ctrl, current_screen_img, r"./img/role/xuanjiao.jpg")
+                        print("点击左上角选角")
+                        # 获取当前屏幕信息并点击坐标
+                        click_img_coordinate(self.ctrl, current_screen_img, heros[2])
+                        hero_num = hero_num + 1
+                        print("角色切换成功")
+                        # 修理装备
+                        repair_equipment(self.ctrl)
+                        # 进布万加地图
+                        bwj(self.ctrl)
+                        print("执行布万家前置步骤，1.修理装备 2.进入地图")
+                        # 启动脚本
+                        self.stop_event = False
+                        print("点击run 按钮")
+                        print(f"我是英雄：{hero_num}")
                 else:
                     # 选择其他地下城页面-战斗开始 按钮
                     time.sleep(3)
@@ -519,9 +534,9 @@ class GameAction:
                     print("==============================")
                     self.ctrl.click(1925, 925)
                     # 判断确定是否再次挑战布万加地图
-                    time.sleep(2)
+                    # time.sleep(2)
                     take_screenshot()
-                    time.sleep(2)
+                    # time.sleep(2)
                     # if find_best_match("./current.jpg", r"./img/buwanjia.jpg"):
                     # if find_best_match(current_screen_img, r"./img/buwanjia.jpg"):
                     #     # 勾选
