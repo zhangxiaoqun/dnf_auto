@@ -22,7 +22,7 @@ def take_screenshot(filename="current_screen_img.jpg"):
         print(f"An error occurred: {e}")
 
 
-def find_best_match(source_image_path, search_image_path):
+def find_best_match(source_image_path, search_image_path, show_img=0):
     # 如果源图像是字符串，尝试加载图像
     if isinstance(source_image_path, str):
         source_img = cv2.imread(source_image_path)
@@ -63,12 +63,13 @@ def find_best_match(source_image_path, search_image_path):
         center_y = top_left[1] + h // 2
         center_coordinates = center_x, center_y
         center_coordinates = str(center_coordinates).replace("(", "").replace(")", "")
-        # 绘制匹配结果 (调试的时候再打开)
-        bottom_right = (top_left[0] + w, top_left[1] + h)
-        cv2.rectangle(source_img, top_left, bottom_right, (0, 255, 0), 2)
-        cv2.imshow("Matched Result", source_img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        if show_img == 1:
+            # 绘制匹配结果 (调试的时候再打开)
+            bottom_right = (top_left[0] + w, top_left[1] + h)
+            cv2.rectangle(source_img, top_left, bottom_right, (0, 255, 0), 2)
+            cv2.imshow("Matched Result", source_img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
 
         # return {
         #     'center_coordinates': center_coordinates,
@@ -99,7 +100,7 @@ if __name__ == '__main__':
     # a = find_best_match(r"../current.jpg", r"../img/pl2.jpg")
     # a = find_best_match(r"../current_screen_img.jpg", r"underground_file/maoxian_icon.jpg")
     # a = find_best_match(r"./11.jpg", r"../img/ruchang.jpg")
-    a = find_best_match(r"./11.jpg", r"../img/pl_num_file/pl300.jpg")
+    a = find_best_match(r"./11.jpg", r"../img/pl_num_file/pl300.jpg", 1)
     # a = find_best_match(r"./16.jpg", r"../img/pl_num_file/pl0.jpg")
     # aa = cv2.imread(r"./11.jpg")
     # a = find_best_match(r"./11.jpg", r"./ruchang.jpg")

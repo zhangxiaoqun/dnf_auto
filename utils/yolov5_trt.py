@@ -1,11 +1,17 @@
 import cv2
 import numpy as np
+# image = np.zeros((512, 512, 3), np.uint8)
+# cv2.imshow('image', image)
+# cv2.waitKey(1)
+# cv2.destroyWindow('image')
 import torch
 from torchvision.ops import nms
 from PIL import Image,ImageOps
-import threading
-import time
-import onnxruntime as ort
+import matplotlib.pyplot as plt
+import torch
+import tensorrt as trt
+import pycuda.driver as cuda
+import pycuda.autoinit
 def resize_img( im):
     target_size = 640   # 目标尺寸
     width, height = im.size
@@ -282,10 +288,17 @@ def non_max_suppression(
             output[xi] = output[xi].to(device)
 
     return output
-
+import threading
+import time
 class YOLOv5:
     def __init__(self, model_path,image_queue,infer_queue,show_queue):
+        # TensorRT日志记录器
+        # self.label = ['Hero', 'arrow', 'gate', 'hero', 'item', 'monster', 'monster_faker', 'white_arrow']
         self.label = ['Monster', 'Monster_ds', 'Monster_szt', 'card', 'equipment', 'go', 'hero', 'map', 'opendoor_d', 'opendoor_l', 'opendoor_r', 'opendoor_u', 'pet', 'Diamond']
+        # self.TRT_LOGGER = trt.Logger(trt.Logger.ERROR)
+        # self.engine = self.load_engine(model_path)
+        # self.host_mem,self.cuda_mem, self.bindings, self.stream = self.allocate_buffers(self.engine)
+        # self.context = self.engine.create_execution_context()
         self.path = model_path
         self.image_queue = image_queue
         self.infer_queue = infer_queue
@@ -294,35 +307,105 @@ class YOLOv5:
         self.thread.daemon = True  # 设置为守护线程（可选）
         self.thread.start()
     def thread(self):
-        # 加载模型并设置为使用CPU
-        session = ort.InferenceSession(self.path,providers=['CPUExecutionProvider'])
-        # 加载模型并设置为使用GPU
-        # session = ort.InferenceSession(self.path, providers=['CUDAExecutionProvider'])
-        # 获取模型输入输出信息
-        input_name = session.get_inputs()[0].name
-        output_names = [output.name for output in session.get_outputs()]
+        context = cuda.Device(0).make_context()
+        self.TRT_LOGGER = trt.Logger(trt.Logger.ERROR)
+        self.engine = self.load_engine(self.path)
+        self.host_mem,self.cuda_mem, self.bindings, self.stream = self.allocate_buffers(self.engine)
+        self.context = self.engine.create_execution_context()
         while True:
             if self.image_queue.empty():
                 time.sleep(0.005)
                 continue
-            img = self.image_queue.get()
-            image = Image.fromarray(cv2.cvtColor(img,cv2.COLOR_BGR2RGB))
-            image,top_pad = resize_img(image)
-            image_array = np.array(image).transpose((2, 0, 1))
-            image_array = np.expand_dims(image_array, axis=0).astype(np.float32)
-            inputs = image_array / 255.0
-            output = session.run(output_names, {input_name: inputs})
-            shape = (1,25200,19)
-            output = np.resize(output[0], shape)
-            output = self.from_numpy(output)
-            output = NonMaximumSuppression(output)[0]
-            output[:,0] = output[:,0]/640
-            output[:,1] = (output[:,1] - top_pad)/(640-top_pad*2)
-            output[:,2] = output[:,2]/640
-            output[:,3] = (output[:,3] - top_pad)/(640-top_pad*2)
-            self.infer_queue.put([img,output])
-            self.show_queue.put([img,output])
+            image = self.image_queue.get()
+            output = self.process(image)
+            self.infer_queue.put([image,output])
+            self.show_queue.put([image,output])
+        context.pop()
     def from_numpy(self,x):
         """Converts a NumPy array to a torch tensor, maintaining device compatibility."""
         return torch.from_numpy(x) if isinstance(x, np.ndarray) else x
+    def process(self,img):
+        # start_time = time.time()
+        image = Image.fromarray(cv2.cvtColor(img,cv2.COLOR_BGR2RGB))
+        image,top_pad = resize_img(image)
+        image_array = np.array(image).transpose((2, 0, 1))
+        image_array = np.expand_dims(image_array, axis=0).astype(np.float32).ravel()
+        inputs = image_array / 255.0
+        np.copyto(self.host_mem[0], inputs)
+        output_data = self.do_inference(self.context, self.host_mem, self.cuda_mem, self.bindings, self.stream)
+        shape = (1,25200,19)
+        output = np.resize(output_data[1], shape)
+        output = self.from_numpy(output)
+        output = NonMaximumSuppression(output)[0]
+        output[:,0] = output[:,0]/640
+        output[:,1] = (output[:,1] - top_pad)/(640-top_pad*2)
+        output[:,2] = output[:,2]/640
+        output[:,3] = (output[:,3] - top_pad)/(640-top_pad*2)
+        # end_time = time.time()
+        # print(f'time taken: {end_time - start_time:.4f} seconds')
+        return output 
+    # 从磁盘加载序列化好的TensorRT引擎
+    def load_engine(self,engine_file_path):
+        # Load the TensorRT engine
+        with open(engine_file_path, "rb") as f, trt.Runtime(self.TRT_LOGGER) as runtime:
+            engine = runtime.deserialize_cuda_engine(f.read())
+            if engine is None:
+                raise ValueError(f"Failed to load engine from {engine_file_path}")
+            return engine
+    # 为输入输出数据分配缓冲区
+    def allocate_buffers(self,engine):
+        bindings = []
+        host_mem = []
+        cuda_mem = []
+        stream = cuda.Stream()
+        # 获取输入和输出tensor的数量
+        num_bindings = engine.num_bindings
+        for binding in range(num_bindings):
+            size = trt.volume(engine.get_binding_shape(binding))
+            dtype = trt.nptype(engine.get_binding_dtype(binding))
+            # 根据是输入还是输出，分配主机和设备缓冲区
+            if engine.binding_is_input(binding):
+                # 输入缓冲区
+                host_buf = cuda.pagelocked_empty(size, dtype)
+                cuda_buf = cuda.mem_alloc(host_buf.nbytes)
+            else:
+                # 输出缓冲区
+                host_buf = cuda.pagelocked_empty(size, dtype)
+                cuda_buf = cuda.mem_alloc(host_buf.nbytes)
+            # 添加到列表中
+            bindings.append(int(cuda_buf))
+            host_mem.append(host_buf)  # 保存主机内存指针，以便后续使用
+            cuda_mem.append(cuda_buf)
+        return host_mem, cuda_mem, bindings, stream
+    def do_inference(self,context, host_mem, cuda_mem, bindings, stream, batch_size=1):
+        # 输入数据的传输
+        [cuda.memcpy_htod_async(inp_device, inp_host, stream) for inp_host, inp_device in zip(host_mem, cuda_mem)]
+        # 执行模型
+        context.execute_async(bindings=bindings,stream_handle=stream.handle)
+        # 输出数据传回主机
+        [cuda.memcpy_dtoh_async(out_host, out_device, stream) for out_host, out_device in zip(host_mem, cuda_mem)]
+        # 等待数据传输结束
+        stream.synchronize()
+        # 输出数据
+        return [out_host for out_host in host_mem]
     
+if __name__ == '__main__':
+    yolo = YOLOv5("/home/linux/workspace/dnfm/dnfm-yolo-tutorial/utils/dnfm.trt")
+    image = cv2.imread("/home/linux/workspace/dnfm/dnfm-yolo-tutorial/utils/1723298258954.jpg")
+    output = yolo.process(image)
+    for boxs in output:
+            # 把坐标从 float 类型转换为 int 类型
+            det_x1, det_y1, det_x2, det_y2,conf,label = boxs
+            # 裁剪目标框对应的图像
+            x1 = int(det_x1*image.shape[1])
+            y1 = int(det_y1*image.shape[0])
+            x2 = int(det_x2*image.shape[1])
+            y2 = int(det_y2*image.shape[0])
+            # 绘制矩形边界框
+            cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            cv2.putText(image, "{:.2f}".format(conf), (int(x1), int(y1-10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
+            cv2.putText(image, yolo.label[int(label)], (int(x1), int(y1-30)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 2)
+    cv2.imshow("test", image)
+    cv2.waitKey(0)
+    print(output)
+    exit()
