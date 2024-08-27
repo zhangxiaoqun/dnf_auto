@@ -27,9 +27,9 @@ if __name__ == '__main__':
     client = ScrcpyADB(image_queue, max_fps=10)
     yolo = YOLOv5(os.path.join(current_dir, "./utils/dnfm.onnx"), image_queue, infer_queue, show_queue)
     # yolo = YOLOv5(os.path.join(current_dir, "./utils/dnf_sim.trt"), image_queue, infer_queue, show_queue)
-    control = GameControl(client, os.path.join(current_dir, "./skill.json"))
+    # control = GameControl(client, os.path.join(current_dir, "./skill.json"))
     # control = GameControl(client, os.path.join(current_dir, "./skill_biaozhun_xiaomi.json"))
-    # control = GameControl(client, os.path.join(current_dir, "./skill_biaozhun_huawei.json"))
+    control = GameControl(client, os.path.join(current_dir, "./skill_jichu_huawei.json"))
     action = GameAction(control, infer_queue)
 
 

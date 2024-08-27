@@ -295,9 +295,9 @@ class YOLOv5:
         self.thread.start()
     def thread(self):
         # 加载模型并设置为使用CPU
-        session = ort.InferenceSession(self.path,providers=['CPUExecutionProvider'])
+        # session = ort.InferenceSession(self.path,providers=['CPUExecutionProvider'])
         # 加载模型并设置为使用GPU
-        # session = ort.InferenceSession(self.path, providers=['CUDAExecutionProvider'])
+        session = ort.InferenceSession(self.path, providers=['CUDAExecutionProvider'])
         # 获取模型输入输出信息
         input_name = session.get_inputs()[0].name
         output_names = [output.name for output in session.get_outputs()]

@@ -6,7 +6,8 @@ import scrcpy
 class ScrcpyADB:
     def __init__(self,image_queue,max_fps=30):
         devices = adb.device_list()
-        client = scrcpy.Client(device=devices[0],max_fps=max_fps,block_frame=True)
+        # client = scrcpy.Client(device=devices[0],max_fps=max_fps,block_frame=True)
+        client = scrcpy.Client(device=devices[0],max_fps=max_fps,block_frame=True, max_width=2416)
         print(devices, client)
         client.add_listener(scrcpy.EVENT_FRAME, self.on_frame)
         client.start(threaded=True)
@@ -37,3 +38,6 @@ class ScrcpyADB:
     def on_frame(self, frame: cv2.Mat):
         if frame is not None:
             self.queue.put(frame)
+
+
+# if __name__ == '__main__':
