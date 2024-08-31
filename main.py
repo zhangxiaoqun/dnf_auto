@@ -12,43 +12,63 @@ import os
 import cv2 as cv
 from img.find_img import find_best_match, take_screenshot
 
+
 class AutoCleaningQueue(queue.Queue):
+    """
+    一个自定义队列，当满时会自动丢弃最旧的元素。
+    """
     def put(self, item, block=True, timeout=None):
+        """
+        将项目添加到队列中。如果队列已满，丢弃最旧的项目。
+
+        :param item: 要添加到队列的项目。
+        :param block: 如果队列满时是否阻塞（默认是True）。
+        :param timeout: 阻塞的超时时间（默认是None）。
+        """
         if self.full():
             self.get()  # 自动丢弃最旧的元素
-        super().put(item, block, timeout)
+        super().put(item, block, timeout)  # 调用父类的put方法
 
 
 if __name__ == '__main__':
+    # 创建三个最大尺寸为3的AutoCleaningQueue实例
     image_queue = AutoCleaningQueue(maxsize=3)
     infer_queue = AutoCleaningQueue(maxsize=3)
     show_queue = AutoCleaningQueue(maxsize=3)
+    # 获取当前脚本的目录
     current_dir = os.path.dirname(os.path.abspath(__file__))
+    # 创建 client 用于与 ScrcpyADB（屏幕镜像/控制）交互
     client = ScrcpyADB(image_queue, max_fps=10)
+    # 初始化 YOLOv5 模型用于对象检测
     yolo = YOLOv5(os.path.join(current_dir, "./utils/dnfm.onnx"), image_queue, infer_queue, show_queue)
     # yolo = YOLOv5(os.path.join(current_dir, "./utils/dnf_sim.trt"), image_queue, infer_queue, show_queue)
     # control = GameControl(client, os.path.join(current_dir, "./skill.json"))
     # control = GameControl(client, os.path.join(current_dir, "./skill_biaozhun_xiaomi.json"))
+    # 使用指定的技能 JSON 配置初始化 GameControl
     control = GameControl(client, os.path.join(current_dir, "./skill_jichu_huawei.json"))
+    # 创建 GameAction 实例以处理游戏中的操作
     action = GameAction(control, infer_queue)
 
 
     while True:
-        if show_queue.empty():
-            time.sleep(0.001)
+        if show_queue.empty():  # 如果显示队列为空
+            time.sleep(0.001)   # 等待微秒
             continue
+        # 获取显示队列中的图像和结果
         image, result = show_queue.get()
-        for boxs in result:
-            det_x1, det_y1, det_x2, det_y2, conf, label = boxs
+        for boxs in result: # 遍历检测结果
+            det_x1, det_y1, det_x2, det_y2, conf, label = boxs # 转换为图像坐标
             x1 = int(det_x1 * image.shape[1])
             y1 = int(det_y1 * image.shape[0])
             x2 = int(det_x2 * image.shape[1])
             y2 = int(det_y2 * image.shape[0])
+            # 绘制检测框
             cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
             cv2.putText(image, "{:.2f}".format(conf), (int(x1), int(y1 - 10)), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                         (0, 0, 255), 2)
             cv2.putText(image, yolo.label[int(label)], (int(x1), int(y1 - 30)), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                         (0, 0, 255), 2)
+        # 调整图像尺寸以适应窗口
         image = cv2.resize(image, (1800, int(image.shape[0] * 1800 / image.shape[1])))
         # 创建按钮区域
         button_panel_width = 100
@@ -69,37 +89,39 @@ if __name__ == '__main__':
                 cv2.putText(panel, label, (20, y1 + 35), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
 
+        # 鼠标事件处理
         def on_mouse(event, x, y, flags, param):
-            if event == cv2.EVENT_LBUTTONDOWN:
+            if event == cv2.EVENT_LBUTTONDOWN:  # 左键点击事件
                 if x > image.shape[1]:  # 检查是否点击在按钮区域
                     x_in_panel = x - image.shape[1]
                     for i, label in enumerate(buttons):
                         y1 = i * (button_height + button_gap) + button_gap
                         y2 = y1 + button_height
                         if y1 <= y <= y2:
-                            print(f"{label} clicked")
+                            print(f"{label} clicked") # 输出点击的按钮
                             handle_button_click(i)  # 调用处理函数，传入按钮索引
                 else:
+                    # 点击图像的其他部分，模拟点击事件
                     control.click(x / image.shape[1] * 2400, y / image.shape[0] * 1080)
 
 
+        # 处理按钮点击事件
         def handle_button_click(button_index):
-            if button_index == 0:
+            if button_index == 0:  # run按钮
                 action.stop_event = False
-            elif button_index == 1:
+            elif button_index == 1:  # stop按钮
                 action.stop_event = True
-            elif button_index == 2:
+            elif button_index == 2:  # reset按钮
                 action.reset()
-
 
         # 合并图片和按钮面板
         def update_display():
             combined = np.hstack((image, button_panel))  # 水平拼接
-            cv2.imshow("Image", combined)
+            cv2.imshow("Image", combined) # 显示合并后的图像
 
         draw_buttons(button_panel)  # 初始化按钮区域
-        cv2.namedWindow("Image")
-        cv2.setMouseCallback("Image", on_mouse)
+        cv2.namedWindow("Image")    # 创建窗口
+        cv2.setMouseCallback("Image", on_mouse) # 设置鼠标回调
         update_display()  # 更新显示
-        cv2.waitKey(1)
+        cv2.waitKey(1)  # 等待按键事件
 

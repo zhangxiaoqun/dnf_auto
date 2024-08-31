@@ -129,3 +129,12 @@ class GameControl:
         y = y + random.randint(-5, 5)
         return x, y
 
+    def slide(self,x, y,  direction):#
+        dir = {"left":[-100,0],"right":[100,0],"up":[0,-100],"down":[0,100]}
+        # start_x = x
+        # start_y = y
+        end_x = x + dir[direction][0]
+        end_y = y + dir[direction][1]
+        start_x, start_y = self._ramdon_xy(x, y)
+        end_x, end_y = self._ramdon_xy(end_x, end_y)
+        self.adb.touch_swipe(start_x, start_y, end_x, end_y)
