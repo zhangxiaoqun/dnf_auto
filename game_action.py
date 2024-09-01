@@ -7,6 +7,7 @@ import numpy as np
 from collections import deque
 import threading
 from img.find_img import find_best_match, take_screenshot, find_best_match_2
+import shared_variables as sv
 
 
 def click_img_coordinate(control, current_screen_img, image_path, gray_convert=1):
@@ -98,14 +99,20 @@ def bwj(control):
     # click_img_coordinate(control, current_screen_img, r"./img/underground_file/battle_start_icon.jpg")
     print("战斗开始")
     time.sleep(2)
-    # 300 pl提示
-    take_screenshot()
-    # if find_best_match(current_screen_img, r"./img/qr.jpg"):
-    if find_best_match_2(current_screen_img, r"./img/underground_file/kuang.jpg"):
-        click_img_coordinate(control, current_screen_img, r"./img/underground_file/kuang.jpg")
-    #     click_img_coordinate(control, current_screen_img, r"./img/ruchang.jpg")
-        click_img_coordinate(control, current_screen_img, r"./img/qr.jpg")
-        print("疲劳超过300提示")
+
+    if sv.hero_num <= 1:
+        pass
+    else:
+        # 300 pl提示
+        take_screenshot()
+        if sv.pl_300_message_num <= 0:
+        # if find_best_match(current_screen_img, r"./img/qr.jpg"):
+            if find_best_match_2(current_screen_img, r"./img/underground_file/kuang.jpg") is not None:
+                click_img_coordinate(control, current_screen_img, r"./img/underground_file/kuang.jpg")
+            #     click_img_coordinate(control, current_screen_img, r"./img/ruchang.jpg")
+                click_img_coordinate(control, current_screen_img, r"./img/qr.jpg")
+                sv.pl_300_message_num = sv.pl_300_message_num + 1
+                print("疲劳超过300提示")
 
 def switch_hero(control, hero_img):
     while True:
@@ -131,18 +138,6 @@ def switch_hero(control, hero_img):
             break
 
 
-def out_time(control, t):
-    # 超时就返回城镇
-    if t is None:
-        t = time.time()
-        print(f"超时时间：{t}")
-
-    # print(outprint, first_find_door_time)
-    if time.time() - t > 5:
-        print("执行超时，进行其他操作")
-        click_img_coordinate(control, "./current_screen_img.jpg", r"./img/setting.jpg")
-        click_img_coordinate(control, "./current_screen_img.jpg", r"./img/return_to_town.jpg")
-        click_img_coordinate(control, "./current_screen_img.jpg", r"./img/qr.jpg")
 
 def calculate_center(box):# 计算矩形框的底边中心点坐标
     return ((box[0] + box[2]) / 2, box[3])
@@ -306,7 +301,10 @@ class GameAction:
         self.reset_event = False  # 重置事件
         self.control_attack = Naima(ctrl)  # 初始化攻击控制
         self.room_num = -1  # 当前房间号
+        self.first_find_door_time = None
         self.buwanjia = [8, 10, 10, 11, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10]  # 房间序列
+        self.adventure_start_time = None  # 冒险开始时间
+        self.adventure_duration = 15 # 冒险持续时间（5分钟）
         self.thread_run = True  # 控制线程运行状态
         self.thread = threading.Thread(target=self.control)  # 创建线程，并指定目标函数
         self.thread.daemon = True  # 设置为守护线程（可选）
@@ -327,6 +325,28 @@ class GameAction:
         self.thread.daemon = True  # 设置为守护线程（可选）
         self.thread.start()  # 启动新线程
 
+    def out_time(self):
+        # 超时就返回城镇
+        if self.first_find_door_time is None:
+            self.first_find_door_time = time.time()
+            # print(f"超时时间：{first_find_door_time}")
+        if time.time() - self.first_find_door_time > 50:  # 检查超时
+            self.stop_event = True
+            self.detect_retry = False
+            # self.detect_retry = True
+            print("执行超时，进行其他操作")
+            click_img_coordinate(self.ctrl, current_screen_img, r"./img/setting.jpg")
+            click_img_coordinate(self.ctrl, current_screen_img, r"./img/return_to_town.jpg")
+            click_img_coordinate(self.ctrl, current_screen_img, r"./img/qr.jpg")
+            time.sleep(10)
+            bwj(self.ctrl)
+            self.room_num = 0  # 重置房间号
+            time.sleep(3)
+            hero_track = deque()  # 重置英雄轨迹
+            hero_track.appendleft([0, 0])  # 初始位置
+            self.ctrl.reset()  # 重置控制
+            self.stop_event = False
+
     def control(self):
         """
         游戏控制的主逻辑。
@@ -337,24 +357,25 @@ class GameAction:
         last_angle = 0  # 上一个角度
 
 
-            #
+        #
         # click_img_coordinate(self.ctrl, current_screen_img, r"./img/role/xuanjiao.jpg")
         # self.ctrl.slide(205, 519, "up")
-        # # image, boxs = self.queue.get()
+        # image, boxs = self.queue.get()
         # first_find_door_time = None
-        # heros = {"大雷给奶一口":r"./img/role/nai1.jpg", "别拽了俺tuo":r"./img/role/bie2.jpg", "大雷是啥子":r"./img/role/kuang3.jpg"}
         # # # current_screen_img = "./current_screen_img.jpg"
-        # take_screenshot()
-        # time.sleep(3)
+        # # take_screenshot()
+        # # time.sleep(3)
         # # bwj(self.ctrl)
-        # hero_num = 0
+        # # hero_num = 0
         # # repair_equipment_and_sell_equipment(self.ctrl)
         # # # sell_equipment(self.ctrl)
+        # heros = {"大雷给奶一口": r"./img/role/nai1.jpg", "别拽了俺tuo": r"./img/role/bie2.jpg", "大雷是啥子": r"./img/role/kuang3.jpg"}
         #
         # while True:
+        #     print(f"1当前活动线程数: {threading.active_count()}")
         #     bwj(self.ctrl)
         #     take_screenshot()
-        #     print("q3123123",hero_num)
+        #     print("q3123123")
         #     time.sleep(5)
         #     if find_best_match(current_screen_img, r"./img/pl_num_file/pl0.jpg") is not None:
         #         print("选择角色中")
@@ -370,40 +391,41 @@ class GameAction:
         #         self.ctrl.click(2064, 338)
         #         print("点击返回城镇")
         #         time.sleep(10)
-        #         if hero_num == 0:
-        #             print(f"我是英雄：{hero_num}")
-        #             switch_hero(self.ctrl, heros["大雷给奶一口"])
-        #             hero_num = hero_num + 1
-        #             # 启动脚本
-        #             # self.stop_event = False
-        #             print("点击run 按钮")
-        #
-        #             # print(f"我是英雄：{heros['大雷给奶一口']}")
-        #         elif hero_num == 1:
-        #             print(f"我是英雄：{hero_num}")
-        #             # switch_hero(self.ctrl, heros["别拽了俺tuo"])
+        #         # 奶你
+        #         if sv.hero_num == 2:
+        #             self.stop_event = True
+        #             print(f"2当前活动线程数: {threading.active_count()}")
+        #             print(f"我是英雄：{sv.hero_num}")
+        #             time.sleep(10)
         #             # 左上角选角
         #             click_img_coordinate(self.ctrl, current_screen_img, r"./img/role/xuanjiao.jpg")
-        #             self.ctrl.click(205, 519)
-        #             time.sleep(10)
+        #             self.ctrl.click(307, 404)
+        #             time.sleep(12)
         #             # 修理装备
         #             # repair_equipment_and_sell_equipment(self.ctrl)
-        #             # 进布万加地图
         #             # bwj(self.ctrl)
-        #             print("执行布万家前置步骤，1.修理装备 2.进入地图")
+        #             # self.control_attack = Naima(self.ctrl)  # 初始化攻击控制
+        #             sv.hero_num = sv.hero_num + 1
+        #             print(sv.hero_num)
+        #             sv.hero_skill_num = 3
         #
-        #             hero_num = hero_num + 1
-        #             # 启动脚本
+        #             # self.thread_run = True
+        #             # # 启动脚本
         #             # self.stop_event = False
         #             print("点击run 按钮")
-        #
-        #         elif hero_num == 2:
-        #             print(f"我是英雄：{hero_num}")
+        #         # # 大雷是啥子
+        #         elif sv.hero_num == 3:
+        #             self.thread_run = False
+        #             print(f"我是英雄：{sv.hero_num}")
         #             switch_hero(self.ctrl, heros["大雷是啥子"])
-        #             hero_num = hero_num + 1
+        #             # self.control_attack = Naima(self.ctrl)  # 初始化攻击控制
+        #             sv.hero_num = sv.hero_num + 1
+        #             print(sv.hero_num)
+        #             sv.hero_skill_num = 3
         #             # 启动脚本
-        #             # self.stop_event = False
+        #             self.stop_event = False
         #             print("点击run 按钮")
+
 
         #     else:
         #         # 选择其他地下城页面-战斗开始 按钮
@@ -449,9 +471,9 @@ class GameAction:
 
 
 
-        # take_screenshot()
-        # 选择角色 （刷图的角色顺序）
-        hero_num = 2  # 角色数量
+    #     # take_screenshot()
+    #     # 选择角色 （刷图的角色顺序）
+    #     # hero_num = 2  # 角色数量
         bwj(self.ctrl)
         self.stop_event = False
         # 重置时间
@@ -475,7 +497,7 @@ class GameAction:
                         last_angle = 0  # 重置角度
                         self.ctrl.reset()  # 重置控制
                         self.pre_state = True  # 设置为预状态
-                        first_find_door_time = None  # 重置发现门的时间
+                        self.first_find_door_time = None  # 重置发现门的时间
                     else:
                         continue
             hero = boxs[boxs[:, 5] == 6][:, :4]  # 获取英雄框
@@ -504,13 +526,15 @@ class GameAction:
                 time.sleep(2.5)
             if len(monster)>0:
                 # 重置时间
-                first_find_door_time = None
+                self.first_find_door_time = None
                 outprint = '有怪物'
                 angle = self.control_attack.control(hero_track[0],image,boxs,self.room_num)
+                print(outprint)
             elif len(equipment)>0:
                 # 重置时间
-                first_find_door_time = None
+                self.first_find_door_time = None
                 outprint = '有材料'
+                print(outprint)
                 if len(gate)>0:
                     close_gate,distance = find_close_point_to_box(gate,hero_track[0])
                     farthest_item,distance = find_farthest_box(equipment,close_gate)
@@ -520,6 +544,7 @@ class GameAction:
                     angle = calculate_point_to_box_angle(hero_track[0],close_item)
                 self.ctrl.attack(False)
                 self.ctrl.move(angle)
+                self.out_time()
             elif len(gate)>0:
                 outprint = '有门'
                 # print(outprint)
@@ -533,41 +558,13 @@ class GameAction:
                     angle = calculate_point_to_box_angle(hero_track[0],close_gate)
                     self.ctrl.attack(False)
                     self.ctrl.move(angle)
-                    # print(outprint)
-                    # 重置时间
-                    # first_find_door_time = None
-                    # out_time(self.ctrl, first_find_door_time)
-                    # 超时就返回城镇
-                    if first_find_door_time is None:
-                        first_find_door_time = time.time()
-                        # print(f"超时时间：{first_find_door_time}")
-                    # print(outprint, first_find_door_time)
-                    if time.time() - first_find_door_time > 50:
-                        print("执行超时，进行其他操作")
-                        click_img_coordinate(self.ctrl, "./current_screen_img.jpg", r"./img/setting.jpg")
-                        click_img_coordinate(self.ctrl, "./current_screen_img.jpg", r"./img/return_to_town.jpg")
-                        click_img_coordinate(self.ctrl, "./current_screen_img.jpg", r"./img/qr.jpg")
-                        time.sleep(10)
-                        bwj(self.ctrl)
-                        self.detect_retry = True
-                        self.stop_event = False
+                    print(outprint)
+                    self.out_time()
             elif len(arrow)>0 and self.room_num != 4:
                 # 超时就返回城镇
-                if first_find_door_time is None:
-                    first_find_door_time = time.time()
-                    # print(f"超时时间：{first_find_door_time}")
-                if time.time() - first_find_door_time > 50:
-                    print("执行超时，进行其他操作")
-                    click_img_coordinate(self.ctrl, "./current_screen_img.jpg", r"./img/setting.jpg")
-                    click_img_coordinate(self.ctrl, "./current_screen_img.jpg", r"./img/return_to_town.jpg")
-                    click_img_coordinate(self.ctrl, "./current_screen_img.jpg", r"./img/qr.jpg")
-                    time.sleep(10)
-                    bwj(self.ctrl)
-                    self.detect_retry = True
-                    self.stop_event = False
+                self.out_time()
                 outprint = '有箭头'
-                # print(outprint)
-                # self.check_adventure_timeout()
+                print(outprint)
                 close_arrow,distance = find_closest_or_second_closest_box(arrow,hero_track[0])
                 angle = calculate_point_to_box_angle(hero_track[0],close_arrow)
                 self.ctrl.move(angle)
@@ -598,30 +595,9 @@ class GameAction:
                     # 点击返回城镇
                     self.ctrl.click(2064, 338)
                     print("点击返回城镇")
-                    # 奶你
-                    if hero_num == 0:
-                        print(f"我是英雄：{hero_num}")
-                        time.sleep(10)
-                        # 左上角选角
-                        click_img_coordinate(self.ctrl, current_screen_img, r"./img/role/xuanjiao.jpg")
-                        self.ctrl.click(307, 404)
-                        time.sleep(12)
-                        # 修理装备
-                        repair_equipment_and_sell_equipment(self.ctrl)
-                        bwj(self.ctrl)
-                        hero_num = hero_num + 1
-                        # 启动脚本
-                        self.stop_event = False
-                        print("点击run 按钮")
-                    if hero_num == 1:
-                        print(f"我是英雄：{hero_num}")
-                        switch_hero(self.ctrl, heros["大雷给奶一口"])
-                        hero_num = hero_num + 1
-                        # 启动脚本
-                        self.stop_event = False
-                        print("点击run 按钮")
-                    elif hero_num == 2:
-                        print(f"我是英雄：{hero_num}")
+                    # 别拽了俺tuo
+                    if sv.hero_num == 2:
+                        print(f"我是英雄：{sv.hero_num}")
                         # switch_hero(self.ctrl, heros["别拽了俺tuo"])
                         time.sleep(10)
                         # 左上角选角
@@ -631,33 +607,63 @@ class GameAction:
                         # 修理装备
                         repair_equipment_and_sell_equipment(self.ctrl)
                         bwj(self.ctrl)
-                        hero_num = hero_num + 1
+                        sv.hero_num = sv.hero_num + 1
+                        sv.hero_skill_num = 2
                         # 启动脚本
                         self.stop_event = False
                         print("点击run 按钮")
-                    elif hero_num == 3:
-                        print(f"我是英雄：{hero_num}")
+                    # 大雷给奶一口
+                    elif sv.hero_num == 3:
+                        print(f"我是英雄：{sv.hero_num}")
+                        switch_hero(self.ctrl, heros["大雷给奶一口"])
+                        sv.hero_num = sv.hero_num + 1
+                        sv.hero_skill_num = 3
+                        # 启动脚本
+                        self.stop_event = False
+                        print("点击run 按钮")
+                    # 奶你
+                    elif sv.hero_num == 4:
+                        print(f"我是英雄：{sv.hero_num}")
+                        time.sleep(10)
+                        # 左上角选角
+                        click_img_coordinate(self.ctrl, current_screen_img, r"./img/role/xuanjiao.jpg")
+                        self.ctrl.click(307, 404)
+                        time.sleep(12)
+                        # 修理装备
+                        repair_equipment_and_sell_equipment(self.ctrl)
+                        bwj(self.ctrl)
+                        sv.hero_num = sv.hero_num + 1
+                        sv.hero_skill_num = 4
+                        # 启动脚本
+                        self.stop_event = False
+                        print("点击run 按钮")
+                    # 大雷是啥子
+                    elif sv.hero_num == 5:
+                        print(f"我是英雄：{sv.hero_num}")
                         switch_hero(self.ctrl, heros["大雷是啥子"])
-                        hero_num = hero_num + 1
+                        sv.hero_num = sv.hero_num + 1
+                        sv.hero_skill_num = 5
                         # 启动脚本
                         self.stop_event = False
                         print("点击run 按钮")
                 else:
                     # 选择其他地下城页面-战斗开始 按钮
-                    time.sleep(3)
+                    # time.sleep(3)
                     print("==============================")
                     print("点击-战斗开始")
                     print("==============================")
                     self.ctrl.click(1925, 925)
-                    take_screenshot()
-                    num = 0
-                    if num == 0:
-                        if find_best_match(self.queue.get()[0], r"./img/qr.jpg") is not None:  # 点击入场
-                            self.ctrl.click(1317, 675)
-                            # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/kuang.jpg")
-                            click_img_coordinate(self.ctrl, current_screen_img, r"./img/qr.jpg")
-                            print("疲劳超过300-点击入场")
-                            num = num + 1
+                    if sv.hero_num <= 1:
+                        pass
+                    else:
+                        take_screenshot()
+                        if sv.pl_300_message_num <= 0:
+                            if find_best_match(self.queue.get()[0], r"./img/qr.jpg") is not None:  # 点击入场
+                                self.ctrl.click(1317, 675)
+                                # click_img_coordinate(self.ctrl, current_screen_img, r"./img/underground_file/kuang.jpg")
+                                click_img_coordinate(self.ctrl, current_screen_img, r"./img/qr.jpg")
+                                print("疲劳超过300-点击入场")
+                                sv.pl_300_message_num = sv.pl_300_message_num + 1
                 self.detect_retry =False
                 self.room_num = 0   # 重置房间号
                 time.sleep(3)
@@ -665,20 +671,9 @@ class GameAction:
                 hero_track.appendleft([0,0])  # 初始位置
             else:
                 # 超时就返回城镇
-                if first_find_door_time is None:
-                    first_find_door_time = time.time()
-                    # print(f"超时时间：{first_find_door_time}")
-                if time.time() - first_find_door_time > 50:  # 检查超时
-                    print("执行超时，进行其他操作")
-                    click_img_coordinate(self.ctrl, "./current_screen_img.jpg", r"./img/setting.jpg")
-                    click_img_coordinate(self.ctrl, "./current_screen_img.jpg", r"./img/return_to_town.jpg")
-                    click_img_coordinate(self.ctrl, "./current_screen_img.jpg", r"./img/qr.jpg")
-                    time.sleep(10)
-                    bwj(self.ctrl)
-                    self.detect_retry = True
-                    self.stop_event = False
+                self.out_time()
                 outprint = "无目标"
-                # print(outprint)
+                print(outprint)
                 if self.room_num == 4:  # 检查房间号
                     angle = calculate_angle_to_box(hero_track[0], [0.25, 0.6]) # 计算角度
                 else:

@@ -2,6 +2,7 @@ import time
 import math
 import cv2
 import pytesseract
+import shared_variables as sv  # 引入共享变量模块
 def calculate_center(box):# 计算矩形框的底边中心点坐标
     return ((box[0] + box[2]) / 2, box[3])
 def calculate_distance(center1, center2):# 计算两个底边中心点之间的欧几里得距离
@@ -83,7 +84,9 @@ class Naima:
         import os
         import json
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, "naima.json")
+        # file_path = os.path.join(current_dir, "naima.json")
+        file_path = os.path.join(current_dir, sv.skill_name_path)
+        print(file_path)
         with open(file_path, 'r', encoding='utf-8') as file:
             self.dict = json.load(file)  # 解析 JSON 文件
     def skill(self,name,t=0):
