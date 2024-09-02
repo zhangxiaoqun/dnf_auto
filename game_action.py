@@ -323,15 +323,23 @@ class GameAction:
         self.thread.start()  # 启动新线程
 
     def out_time(self):
+        # # 超时就返回城镇
+        # if self.timing_time is None:
+        #     self.timing_time = time.time()
+        # print(f"超时时间：{time.time() - self.timing_time}")
+        # if time.time() - self.timing_time > 50:  # 检查超时
         # 超时就返回城镇
         if self.timing_time is None:
             self.timing_time = time.time()
-            # print(f"超时时间：{timing_time}")
-        if time.time() - self.timing_time > 50:  # 检查超时
+        remaining_time = 50 - (time.time() - self.timing_time)  # 计算剩余时间
+        if remaining_time > 0:
+            print(f"超时倒计时：{remaining_time:.2f}秒")
+            time.sleep(1)  # 每秒打印一次
+        else:
+            print("等待时间超时，进行其他操作")
             self.stop_event = True
             self.detect_retry = False
             # self.detect_retry = True
-            print("执行超时，进行其他操作")
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/setting.jpg")
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/return_to_town.jpg")
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/qr.jpg")
@@ -599,7 +607,7 @@ class GameAction:
                     print("点击返回城镇")
                     # 别拽了俺tuo
                     if sv.hero_num == 2:
-                        print(f"我是英雄：{sv.hero_num}")
+                        print(f"我是英雄：别拽了俺tuo,第{sv.hero_num}出场")
                         # switch_hero(self.ctrl, heros["别拽了俺tuo"])
                         time.sleep(10)
                         # 左上角选角
@@ -616,7 +624,7 @@ class GameAction:
                         print("点击run 按钮")
                     # 大雷给奶一口
                     elif sv.hero_num == 3:
-                        print(f"我是英雄：{sv.hero_num}")
+                        print(f"我是英雄：大雷给奶一口,第{sv.hero_num}出场")
                         switch_hero(self.ctrl, heros["大雷给奶一口"])
                         sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 3
@@ -625,7 +633,7 @@ class GameAction:
                         print("点击run 按钮")
                     # 奶你
                     elif sv.hero_num == 4:
-                        print(f"我是英雄：{sv.hero_num}")
+                        print(f"我是英雄：奶你到你还想奶,第{sv.hero_num}出场")
                         time.sleep(10)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
@@ -641,7 +649,7 @@ class GameAction:
                         print("点击run 按钮")
                     # 大雷是啥子
                     elif sv.hero_num == 5:
-                        print(f"我是英雄：{sv.hero_num}")
+                        print(f"我是英雄：大雷是啥子,第{sv.hero_num}出场")
                         switch_hero(self.ctrl, heros["大雷是啥子"])
                         sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 5
