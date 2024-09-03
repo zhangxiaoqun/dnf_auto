@@ -97,7 +97,7 @@ def bwj(control):
     # click_img_coordinate(control, sv.current_screen_img, r"./img/underground_file/battle_start_icon.jpg")
     print("战斗开始")
     time.sleep(2)
-    if 4 >= sv.hero_num:
+    if 4 > sv.hero_num:
         pass
     else:
         # 300 pl提示
@@ -332,8 +332,11 @@ class GameAction:
             self.detect_retry = False
             # self.detect_retry = True
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/setting.jpg")
+            print("点击设置")
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/return_to_town.jpg")
+            print("点击返回城镇")
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/qr.jpg")
+            print("点击确认")
             time.sleep(10)
             bwj(self.ctrl)
             time.sleep(3)
@@ -615,6 +618,7 @@ class GameAction:
                         bwj(self.ctrl)
                         sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 2
+                        self.timing_time = None  # 重置时间
                         # 启动脚本
                         self.stop_event = False
                         print("点击run 按钮")
@@ -624,6 +628,7 @@ class GameAction:
                         switch_hero(self.ctrl, heros["大雷给奶一口"])
                         sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 3
+                        self.timing_time = None  # 重置时间
                         # 启动脚本
                         self.stop_event = False
                         print("点击run 按钮")
@@ -640,6 +645,7 @@ class GameAction:
                         bwj(self.ctrl)
                         sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 4
+                        self.timing_time = None  # 重置时间
                         # 启动脚本
                         self.stop_event = False
                         print("点击run 按钮")
@@ -649,17 +655,18 @@ class GameAction:
                         switch_hero(self.ctrl, heros["大雷是啥子"])
                         sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 5
+                        self.timing_time = None  # 重置时间
                         # 启动脚本
                         self.stop_event = False
                         print("点击run 按钮")
                 else:
                     # 选择其他地下城页面-战斗开始 按钮
-                    # time.sleep(3)
+                    time.sleep(1.5)
                     print("==============================")
                     print("点击-战斗开始")
                     print("==============================")
                     self.ctrl.click(1925, 925)
-                    if 4 >= sv.hero_num:
+                    if 4 > sv.hero_num:
                         pass
                     else:
                         take_screenshot()
