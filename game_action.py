@@ -91,14 +91,13 @@ def bwj(control):
     # 点击布万加地图
     control.click(1636, 812)
     print("点击布万加地图")
-    time.sleep(1)
+    time.sleep(2)
     # 战斗开始
     control.click(1934, 935)
     # click_img_coordinate(control, sv.current_screen_img, r"./img/underground_file/battle_start_icon.jpg")
     print("战斗开始")
     time.sleep(2)
-
-    if sv.hero_num <= 1:
+    if 4 >= sv.hero_num:
         pass
     else:
         # 300 pl提示
@@ -323,19 +322,11 @@ class GameAction:
         self.thread.start()  # 启动新线程
 
     def out_time(self):
-        # # 超时就返回城镇
-        # if self.timing_time is None:
-        #     self.timing_time = time.time()
-        # print(f"超时时间：{time.time() - self.timing_time}")
-        # if time.time() - self.timing_time > 50:  # 检查超时
         # 超时就返回城镇
         if self.timing_time is None:
             self.timing_time = time.time()
-        remaining_time = 50 - (time.time() - self.timing_time)  # 计算剩余时间
-        if remaining_time > 0:
-            print(f"超时倒计时：{remaining_time:.2f}秒")
-            time.sleep(1)  # 每秒打印一次
-        else:
+        # print(f"超时时间：{time.time() - self.timing_time}")
+        if time.time() - self.timing_time > 70:  # 检查超时
             print("等待时间超时，进行其他操作")
             self.stop_event = True
             self.detect_retry = False
@@ -345,11 +336,13 @@ class GameAction:
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/qr.jpg")
             time.sleep(10)
             bwj(self.ctrl)
+            time.sleep(3)
             self.room_num = 0  # 重置房间号
-            # time.sleep(3)
             hero_track = deque()  # 重置英雄轨迹
             hero_track.appendleft([0, 0])  # 初始位置
             self.ctrl.reset()  # 重置控制
+            # 重置时间
+            self.timing_time = None
             self.stop_event = False
 
     def control(self):
@@ -482,7 +475,10 @@ class GameAction:
 
         bwj(self.ctrl)
         self.stop_event = False
+        # # 重置时间
+        self.timing_time = None
         while self.thread_run:  # 循环执行
+
             if self.stop_event:
                 time.sleep(0.001)  # 小等待
                 self.ctrl.reset()  # 发送重置命令
@@ -503,7 +499,7 @@ class GameAction:
                         self.pre_state = True  # 设置为预状态
                     else:
                         continue
-                    # self.timing_time = None  # 重置时间
+                    self.timing_time = None  # 重置时间
             hero = boxs[boxs[:, 5] == 6][:, :4]  # 获取英雄框
             gate = boxs[boxs[:, 5] == self.buwanjia[self.room_num]][:, :4]  # 获取门框
             arrow = boxs[boxs[:, 5] == 5][:, :4]  # 获取箭头框
@@ -529,18 +525,18 @@ class GameAction:
                 self.detect_retry = True
                 time.sleep(2.5)
             if len(monster)>0:
-                # 重置时间
-                self.timing_time = None
+                # # 重置时间
+                # self.timing_time = None
                 outprint = '有怪物'
                 angle = self.control_attack.control(hero_track[0],image,boxs,self.room_num)
-                print(outprint)
+                # print(outprint)
                 # 超时就返回城镇
                 self.out_time()
             elif len(equipment)>0:
                 # 重置时间
-                self.timing_time = None
+                # self.timing_time = None
                 outprint = '有材料'
-                print(outprint)
+                # print(outprint)
                 if len(gate)>0:
                     close_gate,distance = find_close_point_to_box(gate,hero_track[0])
                     farthest_item,distance = find_farthest_box(equipment,close_gate)
@@ -554,9 +550,9 @@ class GameAction:
                 self.out_time()
             elif len(gate)>0:
                 outprint = '有门'
-                print(outprint)
-                # 重置时间
-                self.timing_time = None
+                # print(outprint)
+                # # 重置时间
+                # self.timing_time = None
                 if self.buwanjia[self.room_num] == 9:#左门
                     close_gate,distance = find_close_point_to_box(gate,hero_track[0])
                     angle = calculate_gate_angle(hero_track[0],close_gate)
@@ -570,12 +566,12 @@ class GameAction:
                 # 超时就返回城镇
                 self.out_time()
             elif len(arrow)>0 and self.room_num != 4:
-                # 重置时间
-                self.timing_time = None
+                # # 重置时间
+                # self.timing_time = None
                 # 超时就返回城镇
                 self.out_time()
                 outprint = '有箭头'
-                print(outprint)
+                # print(outprint)
                 close_arrow,distance = find_closest_or_second_closest_box(arrow,hero_track[0])
                 angle = calculate_point_to_box_angle(hero_track[0],close_arrow)
                 self.ctrl.move(angle)
@@ -663,7 +659,7 @@ class GameAction:
                     print("点击-战斗开始")
                     print("==============================")
                     self.ctrl.click(1925, 925)
-                    if sv.hero_num <= 1:
+                    if 4 >= sv.hero_num:
                         pass
                     else:
                         take_screenshot()
@@ -675,16 +671,17 @@ class GameAction:
                                 click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/qr.jpg")
                                 print("疲劳超过300-勾选并点击确认")
                                 sv.pl_300_message_num = sv.pl_300_message_num + 1
+                self.ctrl.move(0)
                 self.detect_retry = False
                 self.room_num = 0   # 重置房间号
-                time.sleep(3)
+                # time.sleep(3)
                 hero_track = deque()  # 重置英雄轨迹
                 hero_track.appendleft([0,0])  # 初始位置
             else:
                 # 超时就返回城镇
                 self.out_time()
                 outprint = "无目标"
-                print(outprint)
+                # print(outprint)
                 if self.room_num == 4:  # 检查房间号
                     angle = calculate_angle_to_box(hero_track[0], [0.25, 0.6]) # 计算角度
                 else:
