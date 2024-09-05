@@ -9,6 +9,8 @@ hero_skill_num = 1
 skill_name_path = "naima.json"
 # 进入地下城满300疲劳提示
 pl_300_message_num = 0
+# 战斗次数
+battle_num = 0
 # 选择其他地下城
 select_other_dxc = [2078, 240]
 # 点击冒险
@@ -36,7 +38,8 @@ role_four = []
 # 角色5
 role_five = []
 
-select_role_dic = {"别拽了俺tuo": [], "奶到你还想奶": [], "大雷给奶一口": [], "大雷是啥子": [], "貌美似朵如花": []}
+# select_role_dic = {"别拽了俺tuo": [], "奶到你还想奶": [], "大雷给奶一口": [], "大雷是啥子": [], "貌美似朵如花": []}
+role_dic = {2:"夏末", 4:"奶到你还想奶", 3:"大雷给奶一口", 5:"大雷是啥子", 6:"貌美似朵如花"}
 
 
 # skill_path = "./default_skill.json"  # 默认的技能路径

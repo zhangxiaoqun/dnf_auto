@@ -8,7 +8,8 @@ from collections import deque
 import threading
 from img.find_img import find_best_match, take_screenshot, find_best_match_2
 import shared_variables as sv
-
+from send_wx import send_miao_reminder
+from datetime import datetime, timedelta
 
 def click_img_coordinate(control, current_screen_img, image_path, gray_convert=1):
     take_screenshot()
@@ -97,11 +98,10 @@ def bwj(control):
     # click_img_coordinate(control, sv.current_screen_img, r"./img/underground_file/battle_start_icon.jpg")
     print("战斗开始")
     time.sleep(2)
-    if 4 > sv.hero_num:
-        pass
-    else:
+    if sv.hero_num >= 4:
         # 300 pl提示
         take_screenshot()
+        print("布万加方法-选择地下城界面截图")
         if sv.pl_300_message_num <= 0:
         # if find_best_match(sv.current_screen_img, r"./img/qr.jpg"):
             if find_best_match_2(sv.current_screen_img, r"./img/underground_file/kuang.jpg") is not None:
@@ -109,7 +109,8 @@ def bwj(control):
                 click_img_coordinate(control, sv.current_screen_img, r"img/underground_file/qr.jpg")
                 sv.pl_300_message_num = sv.pl_300_message_num + 1
                 print("疲劳超过300提示")
-
+    else:
+        pass
 
 def switch_hero(control, hero_img):
     while True:
@@ -328,7 +329,9 @@ class GameAction:
         # print(f"超时时间：{time.time() - self.timing_time}")
         if time.time() - self.timing_time > 70:  # 检查超时
             print("等待时间超时，进行其他操作")
-            self.stop_event = True
+            # 微信公众号提醒
+            send_miao_reminder("等待时间超时，进行其他操作")
+            # self.stop_event = True
             self.detect_retry = False
             # self.detect_retry = True
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/setting.jpg")
@@ -340,6 +343,7 @@ class GameAction:
             time.sleep(10)
             bwj(self.ctrl)
             time.sleep(3)
+            self.ctrl.move(0)
             self.room_num = 0  # 重置房间号
             hero_track = deque()  # 重置英雄轨迹
             hero_track.appendleft([0, 0])  # 初始位置
@@ -476,12 +480,14 @@ class GameAction:
         # 重置时间
         # timing_time = None
 
-        bwj(self.ctrl)
+        # bwj(self.ctrl)
         self.stop_event = False
         # # 重置时间
         self.timing_time = None
+        # 记录开始时间
+        start_time = datetime.now()
+        print("开始时间:", start_time.strftime("%H:%M:%S"))
         while self.thread_run:  # 循环执行
-
             if self.stop_event:
                 time.sleep(0.001)  # 小等待
                 self.ctrl.reset()  # 发送重置命令
@@ -606,18 +612,24 @@ class GameAction:
                     print("点击返回城镇")
                     # 别拽了俺tuo
                     if sv.hero_num == 2:
-                        print(f"我是英雄：别拽了俺tuo,第{sv.hero_num}出场")
+                        # print(f"我是英雄：别拽了俺tuo,第{sv.hero_num}出场")
+                        print(f"我是英雄：夏末,第{sv.hero_num}出场")
                         # switch_hero(self.ctrl, heros["别拽了俺tuo"])
+                        sv.hero_num = sv.hero_num + 1
+                        sv.hero_skill_num = 2
                         time.sleep(10)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
-                        self.ctrl.click(205, 519)
+                        # 魔道
+                        # self.ctrl.click(205, 519)
+                        # 剑魂
+                        self.ctrl.click(199, 523)
                         time.sleep(12)
+                        # 微信公众号提醒
+                        send_miao_reminder(f"我是英雄：夏末,第{sv.hero_num}出场")
                         # 修理装备
                         repair_equipment_and_sell_equipment(self.ctrl)
                         bwj(self.ctrl)
-                        sv.hero_num = sv.hero_num + 1
-                        sv.hero_skill_num = 2
                         self.timing_time = None  # 重置时间
                         # 启动脚本
                         self.stop_event = False
@@ -625,9 +637,11 @@ class GameAction:
                     # 大雷给奶一口
                     elif sv.hero_num == 3:
                         print(f"我是英雄：大雷给奶一口,第{sv.hero_num}出场")
-                        switch_hero(self.ctrl, heros["大雷给奶一口"])
                         sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 3
+                        switch_hero(self.ctrl, heros["大雷给奶一口"])
+                        # 微信公众号提醒
+                        send_miao_reminder(f"我是英雄：大雷给奶一口,第{sv.hero_num}出场")
                         self.timing_time = None  # 重置时间
                         # 启动脚本
                         self.stop_event = False
@@ -635,16 +649,18 @@ class GameAction:
                     # 奶你
                     elif sv.hero_num == 4:
                         print(f"我是英雄：奶你到你还想奶,第{sv.hero_num}出场")
+                        sv.hero_num = sv.hero_num + 1
+                        sv.hero_skill_num = 4
                         time.sleep(10)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
-                        self.ctrl.click(307, 404)
+                        self.ctrl.click(205, 293)
                         time.sleep(12)
+                        # 微信公众号提醒
+                        send_miao_reminder(f"我是英雄：奶你到你还想奶,第{sv.hero_num}出场")
                         # 修理装备
                         repair_equipment_and_sell_equipment(self.ctrl)
                         bwj(self.ctrl)
-                        sv.hero_num = sv.hero_num + 1
-                        sv.hero_skill_num = 4
                         self.timing_time = None  # 重置时间
                         # 启动脚本
                         self.stop_event = False
@@ -652,41 +668,58 @@ class GameAction:
                     # 大雷是啥子
                     elif sv.hero_num == 5:
                         print(f"我是英雄：大雷是啥子,第{sv.hero_num}出场")
-                        switch_hero(self.ctrl, heros["大雷是啥子"])
                         sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 5
+                        switch_hero(self.ctrl, heros["大雷是啥子"])
+                        # 微信公众号提醒
+                        send_miao_reminder(f"我是英雄：大雷是啥子,第{sv.hero_num}出场")
                         self.timing_time = None  # 重置时间
                         # 启动脚本
                         self.stop_event = False
                         print("点击run 按钮")
                 else:
+                    end_time = datetime.now()
+                    print("结束时间:", end_time.strftime("%H:%M:%S"))
+                    # 计算持续时间
+                    duration = end_time - start_time
+                    # 微信公众号提醒
+                    sv.battle_num = sv.battle_num + 1
+                    send_miao_reminder(f"英雄名称: {sv.role_dic[sv.hero_num]},第{sv.battle_num}轮战斗，战斗耗时:{duration}")
+                    # 重置时间
+                    start_time = datetime.now()
+                    print("重置后的开始时间:", start_time.strftime("%H:%M:%S"))
+
+
                     # 选择其他地下城页面-战斗开始 按钮
                     time.sleep(1.5)
                     print("==============================")
                     print("点击-战斗开始")
                     print("==============================")
                     self.ctrl.click(1925, 925)
-                    if 4 > sv.hero_num:
-                        pass
-                    else:
+                    if sv.hero_num >= 4:
                         take_screenshot()
+                        print("地下城-选择地下城界面截图")
+                        # time.sleep(2)
                         if sv.pl_300_message_num <= 0:
-                            if find_best_match_2(sv.current_screen_img, r"./img/underground_file/kuang.jpg") is not None:
-                            # if find_best_match(self.queue.get()[0], r"./img/qr.jpg") is not None:
-                            #     self.ctrl.click(1317, 675)
-                                click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/kuang.jpg")
+                            if find_best_match_2(sv.current_screen_img,
+                                                 r"./img/underground_file/kuang.jpg") is not None:
+                                # if find_best_match(self.queue.get()[0], r"./img/qr.jpg") is not None:
+                                #     self.ctrl.click(1317, 675)
+                                click_img_coordinate(self.ctrl, sv.current_screen_img,
+                                                     r"./img/underground_file/kuang.jpg")
                                 click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/qr.jpg")
                                 print("疲劳超过300-勾选并点击确认")
                                 sv.pl_300_message_num = sv.pl_300_message_num + 1
+                    else:
+                        pass
                 self.ctrl.move(0)
                 self.detect_retry = False
                 self.room_num = 0   # 重置房间号
                 # time.sleep(3)
                 hero_track = deque()  # 重置英雄轨迹
                 hero_track.appendleft([0,0])  # 初始位置
+                self.timing_time = None  # 重置时间
             else:
-                # 超时就返回城镇
-                self.out_time()
                 outprint = "无目标"
                 # print(outprint)
                 if self.room_num == 4:  # 检查房间号
@@ -695,6 +728,8 @@ class GameAction:
                     angle = calculate_angle_to_box(hero_track[0], [0.5, 0.75]) # 计算角度
                 self.ctrl.move(angle)   # 移动到计算的角度
                 self.ctrl.attack(False)  # 停止攻击
+                # 超时就返回城镇
+                self.out_time()
                 print(f"\r当前进度:{outprint},角度{angle}，位置{hero_track[0]}", end="")
             time.sleep(0.001)  # 等待微秒以防止高 CPU 占用
 
