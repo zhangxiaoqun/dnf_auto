@@ -10,6 +10,7 @@ from img.find_img import find_best_match, take_screenshot, find_best_match_2
 import shared_variables as sv
 from send_wx import send_miao_reminder
 from datetime import datetime, timedelta
+from end_time import TimeTracker
 
 def click_img_coordinate(control, current_screen_img, image_path, gray_convert=1):
     take_screenshot()
@@ -480,13 +481,13 @@ class GameAction:
         # 重置时间
         # timing_time = None
 
-        # bwj(self.ctrl)
+        bwj(self.ctrl)
         self.stop_event = False
         # # 重置时间
         self.timing_time = None
         # 记录开始时间
-        start_time = datetime.now()
-        print("开始时间:", start_time.strftime("%H:%M:%S"))
+        tracker = TimeTracker()
+        tracker.start()
         while self.thread_run:  # 循环执行
             if self.stop_event:
                 time.sleep(0.001)  # 小等待
@@ -678,16 +679,15 @@ class GameAction:
                         self.stop_event = False
                         print("点击run 按钮")
                 else:
-                    end_time = datetime.now()
-                    print("结束时间:", end_time.strftime("%H:%M:%S"))
-                    # 计算持续时间
-                    duration = end_time - start_time
                     # 微信公众号提醒
                     sv.battle_num = sv.battle_num + 1
-                    send_miao_reminder(f"英雄名称: {sv.role_dic[sv.hero_num]},第{sv.battle_num}轮战斗，战斗耗时:{duration}")
+                    send_miao_reminder(f"英雄名称: {sv.role_dic[sv.hero_num]},第{sv.battle_num}轮战斗，战斗耗时:{tracker.calculate_duration()}")
+
+                    tracker.stop()
                     # 重置时间
-                    start_time = datetime.now()
-                    print("重置后的开始时间:", start_time.strftime("%H:%M:%S"))
+                    tracker.reset()
+                    time.sleep(1)  # 等待1秒
+                    tracker.start()
 
 
                     # 选择其他地下城页面-战斗开始 按钮
