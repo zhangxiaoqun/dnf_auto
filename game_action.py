@@ -611,78 +611,51 @@ class GameAction:
                     # 点击返回城镇
                     self.ctrl.click(2064, 338)
                     print("点击返回城镇")
-                    # 别拽了俺tuo
+                    sv.hero_num = sv.hero_num + 1
+                    # 剑魂
                     if sv.hero_num == 2:
-                        # print(f"我是英雄：别拽了俺tuo,第{sv.hero_num}出场")
-                        print(f"我是英雄：夏末,第{sv.hero_num}出场")
-                        # switch_hero(self.ctrl, heros["别拽了俺tuo"])
-                        sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 2
                         time.sleep(10)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
-                        # 魔道
-                        # self.ctrl.click(205, 519)
                         # 剑魂
                         self.ctrl.click(199, 523)
                         time.sleep(12)
-                        # 微信公众号提醒
-                        send_miao_reminder(f"我是英雄：夏末,第{sv.hero_num}出场")
                         # 修理装备
                         repair_equipment_and_sell_equipment(self.ctrl)
                         bwj(self.ctrl)
-                        self.timing_time = None  # 重置时间
-                        # 启动脚本
-                        self.stop_event = False
-                        print("点击run 按钮")
                     # 大雷给奶一口
                     elif sv.hero_num == 3:
-                        print(f"我是英雄：大雷给奶一口,第{sv.hero_num}出场")
-                        sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 3
                         switch_hero(self.ctrl, heros["大雷给奶一口"])
-                        # 微信公众号提醒
-                        send_miao_reminder(f"我是英雄：大雷给奶一口,第{sv.hero_num}出场")
-                        self.timing_time = None  # 重置时间
-                        # 启动脚本
-                        self.stop_event = False
-                        print("点击run 按钮")
                     # 奶你
                     elif sv.hero_num == 4:
-                        print(f"我是英雄：奶你到你还想奶,第{sv.hero_num}出场")
-                        sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 4
                         time.sleep(10)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
                         self.ctrl.click(205, 293)
                         time.sleep(12)
-                        # 微信公众号提醒
-                        send_miao_reminder(f"我是英雄：奶你到你还想奶,第{sv.hero_num}出场")
                         # 修理装备
                         repair_equipment_and_sell_equipment(self.ctrl)
                         bwj(self.ctrl)
-                        self.timing_time = None  # 重置时间
-                        # 启动脚本
-                        self.stop_event = False
-                        print("点击run 按钮")
                     # 大雷是啥子
                     elif sv.hero_num == 5:
-                        print(f"我是英雄：大雷是啥子,第{sv.hero_num}出场")
-                        sv.hero_num = sv.hero_num + 1
                         sv.hero_skill_num = 5
                         switch_hero(self.ctrl, heros["大雷是啥子"])
-                        # 微信公众号提醒
-                        send_miao_reminder(f"我是英雄：大雷是啥子,第{sv.hero_num}出场")
-                        self.timing_time = None  # 重置时间
-                        # 启动脚本
-                        self.stop_event = False
-                        print("点击run 按钮")
+                    role_name = f"我是英雄：{sv.role_dic[sv.hero_num]},第{sv.hero_num}出场"
+                    print(role_name)
+                    # 微信公众号提醒
+                    send_miao_reminder(role_name)
+                    self.timing_time = None  # 重置时间
+                    # 启动脚本
+                    self.stop_event = False
+                    print("点击run 按钮")
                 else:
                     # 微信公众号提醒
                     sv.battle_num = sv.battle_num + 1
                     tracker.stop()
-                    time_consuming = tracker.calculate_duration(subtract_seconds=20)
+                    time_consuming = tracker.calculate_duration(subtract_seconds=32)
                     send_miao_reminder(f"英雄名称: {sv.role_dic[sv.hero_num]},第{sv.battle_num}轮战斗，战斗耗时:{time_consuming}")
                     # 重置时间
                     tracker.reset()
