@@ -681,9 +681,9 @@ class GameAction:
                 else:
                     # 微信公众号提醒
                     sv.battle_num = sv.battle_num + 1
-                    send_miao_reminder(f"英雄名称: {sv.role_dic[sv.hero_num]},第{sv.battle_num}轮战斗，战斗耗时:{tracker.calculate_duration()}")
-
                     tracker.stop()
+                    time_consuming = tracker.calculate_duration(subtract_seconds=20)
+                    send_miao_reminder(f"英雄名称: {sv.role_dic[sv.hero_num]},第{sv.battle_num}轮战斗，战斗耗时:{time_consuming}")
                     # 重置时间
                     tracker.reset()
                     time.sleep(1)  # 等待1秒
