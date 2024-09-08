@@ -1,5 +1,5 @@
 # 英雄顺序
-hero_num = 2  # 初始化hero_num变量
+hero_num = 6  # 初始化hero_num变量
 # 截取图片路径
 current_screen_img = "./current_screen_img.jpg"
 # 技能模板
@@ -39,7 +39,7 @@ role_four = []
 role_five = []
 
 # select_role_dic = {"别拽了俺tuo": [], "奶到你还想奶": [], "大雷给奶一口": [], "大雷是啥子": [], "貌美似朵如花": []}
-role_dic = {2:"夏末", 4:"奶到你还想奶", 3:"大雷给奶一口", 5:"大雷是啥子", 6:"貌美似朵如花"}
+role_dic = {1: "别拽了俺脱", 2: "夏末", 4: "奶到你还想奶", 3: "大雷给奶一口", 5: "大雷是啥子", 6: "貌美似朵如花"}
 
 
 # skill_path = "./default_skill.json"  # 默认的技能路径
