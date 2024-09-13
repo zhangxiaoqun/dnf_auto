@@ -129,10 +129,14 @@ class GameControl:
         y = y + random.randint(-5, 5)
         return x, y
 
-    def slide(self,x, y,  direction):#
-        dir = {"left":[-100,0],"right":[100,0],"up":[0,-100],"down":[0,100]}
-        # start_x = x
-        # start_y = y
+    def slide(self, x, y, direction, distance=100):
+        dir = {
+            "left": [-distance, 0],
+            "right": [distance, 0],
+            "up": [0, -distance],
+            "down": [0, distance]
+        }
+
         end_x = x + dir[direction][0]
         end_y = y + dir[direction][1]
         start_x, start_y = self._ramdon_xy(x, y)

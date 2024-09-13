@@ -58,13 +58,17 @@ if __name__ == '__main__':
     client = ScrcpyADB(image_queue, max_fps=10)
     # 初始化 YOLOv5 模型用于对象检测
     yolo = YOLOv5(os.path.join(current_dir, "./utils/dnfm.onnx"), image_queue, infer_queue, show_queue)
+    # yolo = YOLOv5(os.path.join(current_dir, "./utils/df.onnx"), image_queue, infer_queue, show_queue)
     # yolo = YOLOv5(os.path.join(current_dir, "./utils/dnf_sim.trt"), image_queue, infer_queue, show_queue)
+
+    # 使用指定的技能 JSON 配置初始化 GameControl
     # control = GameControl(client, os.path.join(current_dir, "./skill.json"))
     # control = GameControl(client, os.path.join(current_dir, "./skill_biaozhun_xiaomi.json"))
-    # 使用指定的技能 JSON 配置初始化 GameControl
     control = GameControl(client, os.path.join(current_dir, "./skill_jichu_huawei.json"))
+
     # 创建 GameAction 实例以处理游戏中的操作
     action = GameAction(control, infer_queue)
+
     # last_hero_skill_num = sv.hero_skill_num
     while True:
         # 在主循环中根据需要重新初始化 GameControl
@@ -76,7 +80,7 @@ if __name__ == '__main__':
         #     print(f"3当前活动线程数: {threading.active_count()}")
         #     action.stop_event = True
         #     # action.thread_run = False
-        #     action.thread = False
+        #     action.thread_run = True
         #     # action.reset()
         #     action = GameAction(control, infer_queue)  # 重新创建 GameAction
         #     last_hero_skill_num = sv.hero_skill_num  # 更新最后的英雄编号

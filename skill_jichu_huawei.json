@@ -1,6 +1,6 @@
 {
     "joystick": {
-        "center": [415, 787],
+        "center": [404, 785],
         "radius": 180
     },
     "attack":[2096, 968],
@@ -23,5 +23,7 @@
     "skill14":"right",
     "skill15":"down",
     "skill16":[1642,975],
-    "skill17":[2016,855]
+    "skill17":[2016,855],
+    "skill18":[941,777]
+
 }
