@@ -1,5 +1,5 @@
 # 英雄顺序
-hero_num = 1  # 初始化hero_num变量
+hero_num = 6  # 初始化hero_num变量
 # 截取图片路径
 current_screen_img = "./current_screen_img.jpg"
 # 技能模板
@@ -48,12 +48,12 @@ role_seq_coord = {
     "role_index4": [196, 532]}
 
 # skill_path = "./default_skill.json"  # 默认的技能路径
-if hero_skill_num == 3 or hero_skill_num == 4:
-    # skill_path = "./role_skill/naima.json"
-    skill_name_path = "naima.json"
-elif hero_skill_num == 5:
-    # skill_path = "./role_skill/kuangzhanshi.json"
-    skill_name_path = "kzs.json"
+# if hero_skill_num == 3 or hero_skill_num == 4:
+#     # skill_path = "./role_skill/naima.json"
+#     skill_name_path = "naima.json"
+# elif hero_skill_num == 5:
+#     # skill_path = "./role_skill/kuangzhanshi.json"
+#     skill_name_path = "kzs.json"
 
 
 

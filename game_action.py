@@ -137,10 +137,10 @@ def switch_hero(control, hero_img):
             print("角色切换成功")
         else:
             # 修理装备
-            repair_equipment_and_sell_equipment(control)
-            # 进布万加地图
-            bwj(control)
-            print("执行布万家前置步骤，1.修理装备 2.进入地图")
+            # repair_equipment_and_sell_equipment(control)
+            # # 进布万加地图
+            # bwj(control)
+            # print("执行布万家前置步骤，1.修理装备 2.进入地图")
             break
 
 
@@ -547,7 +547,7 @@ class GameAction:
                         print("点击选角")
                         # 剑魂
                         time.sleep(4)
-                        self.ctrl.click(199, 523)
+                        self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
                         time.sleep(12)
                         # 修理装备
                         repair_equipment_and_sell_equipment(self.ctrl)
@@ -555,10 +555,8 @@ class GameAction:
                     # 大雷给奶一口
                     elif sv.hero_num == 3:
                         sv.hero_skill_num = 3
-                        switch_hero(self.ctrl, heros["大雷给奶一口"])
-                    # 奶你
-                    elif sv.hero_num == 4:
-                        sv.hero_skill_num = 4
+                        # switch_hero(self.ctrl, heros["大雷给奶一口"])
+
                         time.sleep(12)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
@@ -570,19 +568,45 @@ class GameAction:
                         # 修理装备
                         repair_equipment_and_sell_equipment(self.ctrl)
                         bwj(self.ctrl)
+
+                    # 奶你
+                    elif sv.hero_num == 4:
+                        sv.hero_skill_num = 4
+                        time.sleep(12)
+                        # 左上角选角
+                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
+                        print("点击选角")
+                        time.sleep(4)
+                        self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
+                        time.sleep(12)
+                        # 修理装备
+                        repair_equipment_and_sell_equipment(self.ctrl)
+                        bwj(self.ctrl)
                     # 大雷是啥子
                     elif sv.hero_num == 5:
                         sv.hero_skill_num = 5
-                        switch_hero(self.ctrl, heros["大雷是啥子"])
+                        # switch_hero(self.ctrl, heros["大雷是啥子"])
+
+                        time.sleep(12)
+                        # 左上角选角
+                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
+                        print("点击选角")
+                        time.sleep(4)
+                        self.ctrl.click(role_sx["role_index1"][0], role_sx["role_index1"][1])
+                        time.sleep(12)
+                        # 修理装备
+                        repair_equipment_and_sell_equipment(self.ctrl)
+                        bwj(self.ctrl)
+
                     # 剑宗
                     elif sv.hero_num == 6:
                         sv.hero_skill_num = 6
-                        time.sleep(10)
+                        time.sleep(12)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
                         print("点击选角")
                         # 滑动角色
-                        time.sleep(2)
+                        time.sleep(4)
                         self.ctrl.slide(208, 524, "up", distance=400)
                         time.sleep(4)
                         self.ctrl.click(role_sx["role_index3"][0], role_sx["role_index3"][1])
@@ -593,13 +617,14 @@ class GameAction:
                     # 踹你一脚气
                     elif sv.hero_num == 7:
                         sv.hero_skill_num = 7
-                        time.sleep(10)
+                        time.sleep(12)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
                         print("点击选角")
                         # 滑动角色
-                        self.ctrl.slide(208, 524, "up", distance=400)
                         time.sleep(4)
+                        self.ctrl.slide(208, 524, "up", distance=400)
+                        time.sleep(6)
                         self.ctrl.click(role_sx["role_index3"][0], role_sx["role_index3"][1])
                         time.sleep(12)
                         # 修理装备
