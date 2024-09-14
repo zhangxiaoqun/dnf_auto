@@ -142,9 +142,11 @@ if __name__ == '__main__':
         # 处理按钮点击事件a
         def handle_button_click(button_index):
             if button_index == 0:  # run按钮
-                action.stop_event = False
+                # action.stop_event = False
+                action.stop_event.clear()
             elif button_index == 1:  # stop按钮
-                action.stop_event = True
+                # action.stop_event = True
+                action.stop_event.set()
             elif button_index == 2:  # reset按钮
                 action.reset()
 

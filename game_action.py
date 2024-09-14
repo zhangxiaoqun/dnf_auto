@@ -304,8 +304,10 @@ class GameAction:
         self.ctrl = ctrl  # 控制游戏的对象
         self.detect_retry = False  # 是否需要重试检测
         self.pre_state = True  # 之前的状态
-        self.stop_event = True  # 停止事件
-        self.reset_event = False  # 重置事件
+        # self.stop_event = True  # 停止事件
+        # self.reset_event = False  # 重置事件
+        self.stop_event = threading.Event()  # 使用 Event 来控制线程停止
+        self.reset_event = threading.Event()  # 同样使用 Event 来控制重置信号
         self.control_attack = HeroController(ctrl)  # 初始化攻击控制
         self.room_num = -1  # 当前房间号
         self.timing_time = None
@@ -323,7 +325,9 @@ class GameAction:
         """
         重置游戏状态，重新启动控制线程。
         """
-        self.thread_run = False  # 停止当前线程
+        self.stop_event.set()  # 设置停止事件
+        self.thread.join()  # 等待线程结束
+        # self.thread_run = False  # 停止当前线程
         time.sleep(0.1)  # 等待0.1秒
         self.room_num = -1  # 重置房间号
         self.detect_retry = False  # 重置重试状态
