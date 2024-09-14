@@ -14,7 +14,7 @@ from end_time import TimeTracker
 import random
 
 
-def click_img_coordinate(control, current_screen_img, image_path, gray_convert=1):
+def click_img_coordinate(control, current_screen_img, image_path, gray_convert=1, t=0.5):
     take_screenshot()
     if gray_convert == 1:
         hero_center_coordinates = find_best_match(current_screen_img, image_path)
@@ -23,7 +23,7 @@ def click_img_coordinate(control, current_screen_img, image_path, gray_convert=1
     if hero_center_coordinates is not None:
         # time.sleep(1)
         control.click(hero_center_coordinates[0], hero_center_coordinates[1])
-        # time.sleep(2)
+        time.sleep(t)
         return True
     return False
 
@@ -387,6 +387,31 @@ class GameAction:
             self.stop_event = False
 
 
+    def check_hero_status(self):
+        """检查英雄状态，判断是否死亡并返回城镇"""
+        current_time = time.time()
+        if current_time - self.last_screenshot_time > 20:  # 每5秒检测一次
+            take_screenshot()  # 截图当前屏幕
+            if find_best_match_2(sv.current_screen_img, r"./img/underground_file/fhcz.jpg") is not None:
+                print("英雄死亡")
+                self.detect_retry = False
+                click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/fhcz.jpg")
+                print("点击返回城镇")
+                click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/qr.jpg")
+                print("点击确认")
+                time.sleep(10)  # 给点时间在返回城镇前
+                bwj(self.ctrl)
+                time.sleep(3)
+                self.ctrl.move(0)
+                self.room_num = 0  # 重置房间号
+                hero_track = deque()  # 重置英雄轨迹
+                hero_track.appendleft([0, 0])  # 初始位置
+                self.ctrl.reset()  # 重置控制
+                # 重置时间
+                self.timing_time = None
+                self.stop_event = False
+            self.last_screenshot_time = current_time  # 更新最后一次截图时间
+
     def control(self):
         """
         游戏控制的主逻辑。
@@ -411,6 +436,10 @@ class GameAction:
             if self.queue.empty():  # 如果队列为空
                 time.sleep(0.001)  # 等待
                 continue
+
+            # 检查英雄状态
+            self.check_hero_status()
+
             image, boxs = self.queue.get()  # 获取队列中的图像和框
             if is_image_almost_black(image):  # 如果图像接近黑色
                 if self.pre_state == False:
@@ -538,20 +567,18 @@ class GameAction:
                     sv.hero_num = sv.hero_num + 1
                     # 角色顺序
                     role_sx = sv.role_seq_coord
-                    # 剑魂
+                    # 魔道
                     if sv.hero_num == 2:
                         sv.hero_skill_num = 2
                         time.sleep(12)
                         # 左上角选角
-                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
+                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
                         print("点击选角")
-                        # 剑魂
-                        time.sleep(4)
                         self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
                         time.sleep(12)
-                        # 修理装备
-                        repair_equipment_and_sell_equipment(self.ctrl)
-                        bwj(self.ctrl)
+                        # # 修理装备
+                        # repair_equipment_and_sell_equipment(self.ctrl)
+                        # bwj(self.ctrl)
                     # 大雷给奶一口
                     elif sv.hero_num == 3:
                         sv.hero_skill_num = 3
@@ -559,29 +586,27 @@ class GameAction:
 
                         time.sleep(12)
                         # 左上角选角
-                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
+                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
                         print("点击选角")
-                        # self.ctrl.click(205, 293)
-                        time.sleep(4)
                         self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
                         time.sleep(12)
-                        # 修理装备
-                        repair_equipment_and_sell_equipment(self.ctrl)
-                        bwj(self.ctrl)
+                        # # 修理装备
+                        # repair_equipment_and_sell_equipment(self.ctrl)
+                        # bwj(self.ctrl)
 
                     # 奶你
                     elif sv.hero_num == 4:
                         sv.hero_skill_num = 4
                         time.sleep(12)
                         # 左上角选角
-                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
+                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
                         print("点击选角")
                         time.sleep(4)
                         self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
                         time.sleep(12)
-                        # 修理装备
-                        repair_equipment_and_sell_equipment(self.ctrl)
-                        bwj(self.ctrl)
+                        # # 修理装备
+                        # repair_equipment_and_sell_equipment(self.ctrl)
+                        # bwj(self.ctrl)
                     # 大雷是啥子
                     elif sv.hero_num == 5:
                         sv.hero_skill_num = 5
@@ -589,47 +614,44 @@ class GameAction:
 
                         time.sleep(12)
                         # 左上角选角
-                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
+                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
                         print("点击选角")
-                        time.sleep(4)
                         self.ctrl.click(role_sx["role_index1"][0], role_sx["role_index1"][1])
                         time.sleep(12)
-                        # 修理装备
-                        repair_equipment_and_sell_equipment(self.ctrl)
-                        bwj(self.ctrl)
+                        # # 修理装备
+                        # repair_equipment_and_sell_equipment(self.ctrl)
+                        # bwj(self.ctrl)
 
                     # 剑宗
                     elif sv.hero_num == 6:
                         sv.hero_skill_num = 6
                         time.sleep(12)
                         # 左上角选角
-                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
+                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
                         print("点击选角")
                         # 滑动角色
-                        time.sleep(4)
                         self.ctrl.slide(208, 524, "up", distance=400)
-                        time.sleep(4)
+                        time.sleep(6)
                         self.ctrl.click(role_sx["role_index3"][0], role_sx["role_index3"][1])
                         time.sleep(12)
-                        # 修理装备
-                        repair_equipment_and_sell_equipment(self.ctrl)
-                        bwj(self.ctrl)
+                        # # 修理装备
+                        # repair_equipment_and_sell_equipment(self.ctrl)
+                        # bwj(self.ctrl)
                     # 踹你一脚气
                     elif sv.hero_num == 7:
                         sv.hero_skill_num = 7
                         time.sleep(12)
                         # 左上角选角
-                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg")
+                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
                         print("点击选角")
                         # 滑动角色
-                        time.sleep(4)
                         self.ctrl.slide(208, 524, "up", distance=400)
                         time.sleep(6)
                         self.ctrl.click(role_sx["role_index3"][0], role_sx["role_index3"][1])
                         time.sleep(12)
-                        # 修理装备
-                        repair_equipment_and_sell_equipment(self.ctrl)
-                        bwj(self.ctrl)
+                    # 修理装备
+                    repair_equipment_and_sell_equipment(self.ctrl)
+                    bwj(self.ctrl)
                     role_name = f"我是英雄：{sv.role_dic[sv.hero_num]},第{sv.hero_num}出场"
                     print(role_name)
                     # 微信公众号提醒

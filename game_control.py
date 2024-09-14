@@ -65,6 +65,10 @@ class GameControl:
         if isinstance(self.config[name], str):
             self.Roulette(name)
             return
+        if isinstance(self.config[name][-1], str):
+            h = self.config[name]
+            self.slide(x=h[0], y=h[1], direction=h[-1])
+            return
         if self.attack_touch != "none":
             self.adb.touch_up(self.pos[0], self.pos[1],2)
             self.attack_touch == "none"

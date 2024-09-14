@@ -113,7 +113,7 @@ class HeroController:
         with open(file_path, 'r', encoding='utf-8') as file:
             self.dict = json.load(file)  # 解析 JSON 文件
 
-    def skill(self, name, t=0):
+    def skill(self, name, t: float =0):
         """执行技能"""
         self.ctrl.skill(self.dict[name], t)
         print("shifang:", name)
@@ -121,18 +121,23 @@ class HeroController:
     def control(self, hero_pos, image, boxs, MapNumber):
         """根据英雄编号选择控制逻辑"""
         hero_num = sv.hero_num  # 从共享变量中获取英雄编号
-        if hero_num == 1 or hero_num == 2 or hero_num == 3 or hero_num == 4 or hero_num == 5 or hero_num == 6:
+        if hero_num == 3 or hero_num == 4 or hero_num == 5:
+            return self.control_hero_0(hero_pos, image, boxs, MapNumber)
+        elif hero_num == 1:
             return self.control_hero_1(hero_pos, image, boxs, MapNumber)
+        elif hero_num == 2:
+            return self.control_hero_2(hero_pos, image, boxs, MapNumber)
+        elif hero_num == 6:
+            return self.control_hero_6(hero_pos, image, boxs, MapNumber)
         elif hero_num == 7:
             return self.control_hero_7(hero_pos, image, boxs, MapNumber)
-        # elif hero_num == 2:
-        #     return self.control_hero_2(hero_pos, image, boxs, MapNumber)
         # 继续为其他英雄添加elif分支
         else:
             print("未定义的英雄编号")
             return None
 
-    def control_hero_1(self, hero_pos, image, boxs, MapNumber):
+    # 通用
+    def control_hero_0(self, hero_pos, image, boxs, MapNumber):
         """英雄 1 的控制逻辑"""
         if self.pre_room_num != MapNumber:
             wait = 0.1
@@ -215,6 +220,266 @@ class HeroController:
         # 这里添加其他英雄 0 的具体控制逻辑
         return self.perform_common_actions(hero_pos, boxs)
 
+    # 剑魂
+    def control_hero_1(self, hero_pos, image, boxs, MapNumber):
+        """英雄 2 的控制逻辑"""
+        if self.pre_room_num != MapNumber:
+            wait = 0.1
+            if MapNumber == 0:
+                self.ctrl.reset()
+                time.sleep(wait)
+                self.skill("勇气祝福")
+                time.sleep(1.2)
+                self.ctrl.move(335)
+                time.sleep(1.5)
+                self.skill("领悟之雷")
+            elif MapNumber == 1:
+                time.sleep(wait)
+                self.ctrl.move(295)
+                time.sleep(0.4)
+                self.skill("光明惩戒")
+                time.sleep(1)
+            elif MapNumber == 2:
+                time.sleep(wait)
+                self.ctrl.move(340)
+                time.sleep(0.6)
+                self.skill("光芒烬盾")
+            elif MapNumber == 3:
+                time.sleep(wait)
+                self.ctrl.move(345)
+                time.sleep(0.5)
+                self.skill("勇气颂歌")
+            elif MapNumber == 4:
+                time.sleep(wait)
+                self.ctrl.move(145)
+                time.sleep(0.65)
+                self.ctrl.move(1)
+                time.sleep(0.05)
+                self.skill("胜利之矛")
+                time.sleep(0.5)
+                self.ctrl.move(1)
+                time.sleep(0.2)
+                self.skill("光芒烬盾")
+            elif MapNumber == 5:
+                time.sleep(wait)
+                self.ctrl.move(180)
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+            elif MapNumber == 6:
+                None
+            elif MapNumber == 7:
+                time.sleep(wait)
+                self.ctrl.move(335)
+                time.sleep(0.4)
+                self.ctrl.move(0)
+                self.skill("光芒烬盾")
+                time.sleep(1)
+                self.skill("沐天之光")
+            elif MapNumber == 8:
+                time.sleep(wait)
+                self.ctrl.move(340)
+                time.sleep(0.4)
+                self.skill("胜利之矛")
+                time.sleep(0.5)
+                self.ctrl.move(1)
+                time.sleep(0.5)
+                self.skill("光明惩戒")
+            elif MapNumber == 9:
+                time.sleep(wait)
+                self.ctrl.move(330)
+                time.sleep(0.4)
+                self.ctrl.move(0)
+                self.skill("光芒烬盾")
+                time.sleep(0.8)
+                self.skill("光明之杖")
+            self.pre_room_num = MapNumber
+            return 0  # 更新房间编号并返回
+
+        # 这里添加其他英雄 2 的具体控制逻辑
+        return self.perform_common_actions(hero_pos, boxs)
+
+    # 魔道
+    def control_hero_2(self, hero_pos, image, boxs, MapNumber):
+        """英雄 1 的控制逻辑"""
+        if self.pre_room_num != MapNumber:
+            wait = 0.1
+            if MapNumber == 0:
+                self.ctrl.reset()
+                time.sleep(wait)
+                self.skill("勇气祝福")
+                time.sleep(1.2)
+                self.ctrl.move(335)
+                time.sleep(0.3)
+                self.skill("领悟之雷")
+            elif MapNumber == 1:
+                time.sleep(wait)
+                self.ctrl.move(295)
+                time.sleep(0.4)
+                self.skill("光明惩戒")
+                time.sleep(1)
+            elif MapNumber == 2:
+                time.sleep(wait)
+                self.ctrl.move(340)
+                time.sleep(0.6)
+                self.skill("光芒烬盾")
+            elif MapNumber == 3:
+                time.sleep(wait)
+                self.ctrl.move(345)
+                time.sleep(0.5)
+                self.skill("勇气颂歌")
+                time.sleep(1.2)
+                self.skill("后跳")
+                time.sleep(0.3)
+                self.skill("后跳")
+            elif MapNumber == 4:
+                time.sleep(wait)
+                self.ctrl.move(145)
+                time.sleep(0.65)
+                self.ctrl.move(1)
+                time.sleep(0.05)
+                self.skill("胜利之矛")
+                time.sleep(0.5)
+                self.ctrl.move(1)
+                time.sleep(0.2)
+                self.skill("光芒烬盾")
+            elif MapNumber == 5:
+                time.sleep(wait)
+                self.ctrl.move(180)
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+            elif MapNumber == 6:
+                None
+            elif MapNumber == 7:
+                time.sleep(wait)
+                self.ctrl.move(335)
+                time.sleep(0.4)
+                self.ctrl.move(0)
+                self.skill("光芒烬盾")
+                time.sleep(1)
+                self.skill("沐天之光")
+            elif MapNumber == 8:
+                time.sleep(wait)
+                self.ctrl.move(340)
+                time.sleep(0.4)
+                self.skill("胜利之矛")
+                time.sleep(0.5)
+                self.ctrl.move(1)
+                time.sleep(0.5)
+                self.skill("光明惩戒")
+            elif MapNumber == 9:
+                time.sleep(wait)
+                self.ctrl.move(330)
+                time.sleep(0.4)
+                self.ctrl.move(0)
+                self.skill("光芒烬盾")
+                time.sleep(0.8)
+                self.skill("光明之杖")
+            self.pre_room_num = MapNumber
+            return 0  # 更新房间编号并返回
+
+        # 这里添加其他英雄 0 的具体控制逻辑
+        return self.perform_common_actions(hero_pos, boxs)
+
+    # 剑宗
+    def control_hero_6(self, hero_pos, image, boxs, MapNumber):
+        """英雄 1 的控制逻辑"""
+        if self.pre_room_num != MapNumber:
+            wait = 0.1
+            if MapNumber == 0:
+                self.ctrl.reset()
+                time.sleep(wait)
+                self.skill("勇气祝福")
+                time.sleep(1.2)
+                self.skill("魔剑降临")
+                time.sleep(1.2)
+                self.ctrl.move(335)
+                time.sleep(0.3)
+                self.skill("领悟之雷")
+            elif MapNumber == 1:
+                time.sleep(wait)
+                self.ctrl.move(295)
+                time.sleep(0.4)
+                self.skill("光明惩戒", t=1.2)
+                # self.ctrl.click(1717, 857, t=1.2)
+                time.sleep(1)
+            elif MapNumber == 2:
+                time.sleep(wait)
+                self.ctrl.move(340)
+                time.sleep(0.6)
+                self.skill("光芒烬盾")
+            elif MapNumber == 3:
+                time.sleep(wait)
+                self.ctrl.move(345)
+                time.sleep(0.5)
+                self.skill("勇气颂歌")
+            elif MapNumber == 4:
+                time.sleep(wait)
+                self.ctrl.move(145)
+                time.sleep(0.65)
+                self.ctrl.move(1)
+                time.sleep(0.05)
+                self.skill("胜利之矛")
+                time.sleep(0.5)
+                self.ctrl.move(1)
+                time.sleep(0.2)
+                self.skill("光芒烬盾")
+            elif MapNumber == 5:
+                time.sleep(wait)
+                self.ctrl.move(180)
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+            elif MapNumber == 6:
+                None
+            elif MapNumber == 7:
+                time.sleep(wait)
+                self.ctrl.move(335)
+                time.sleep(0.4)
+                self.ctrl.move(0)
+                self.skill("光芒烬盾")
+                time.sleep(1)
+                self.skill("沐天之光")
+            elif MapNumber == 8:
+                time.sleep(wait)
+                self.ctrl.move(340)
+                time.sleep(0.4)
+                self.skill("胜利之矛")
+                time.sleep(0.5)
+                self.ctrl.move(1)
+                time.sleep(0.5)
+                self.skill("光明惩戒", t=1.2)
+            elif MapNumber == 9:
+                time.sleep(wait)
+                self.ctrl.move(330)
+                time.sleep(0.4)
+                self.ctrl.move(0)
+                self.skill("光芒烬盾")
+                time.sleep(0.8)
+                self.skill("光明之杖", t=1.2)
+            self.pre_room_num = MapNumber
+            return 0  # 更新房间编号并返回
+
+        # 这里添加其他英雄 0 的具体控制逻辑
+        return self.perform_common_actions(hero_pos, boxs)
+
+    # 散打
     def control_hero_7(self, hero_pos, image, boxs, MapNumber):
         """英雄 7 的控制逻辑"""
         if self.pre_room_num != MapNumber:
@@ -312,20 +577,6 @@ class HeroController:
             return 0  # 更新房间编号并返回
 
         # 这里添加其他英雄 1 的具体控制逻辑
-        return self.perform_common_actions(hero_pos, boxs)
-
-    def control_hero_2(self, hero_pos, image, boxs, MapNumber):
-        """英雄 2 的控制逻辑"""
-        if self.pre_room_num != MapNumber:
-            wait = 0.1
-            time.sleep(wait)
-            self.ctrl.move(340)
-            time.sleep(0.6)
-            self.skill("光芒烬盾")
-            self.pre_room_num = MapNumber
-            return 0  # 更新房间编号并返回
-
-        # 这里添加其他英雄 2 的具体控制逻辑
         return self.perform_common_actions(hero_pos, boxs)
 
 
