@@ -2,6 +2,7 @@ import cv2
 from adbutils import adb
 import time
 import scrcpy
+import os
 
 class ScrcpyADB:
     def __init__(self, image_queue, max_fps=30):
@@ -50,5 +51,20 @@ class ScrcpyADB:
         """处理接收到的帧"""
         if frame is not None:
             self.queue.put(frame)  # 将帧放入队列
+
+    def screenshot(self, filename, t=0):
+        """保存当前屏幕帧为图像文件"""
+        time.sleep(t)
+        if self.last_screen is not None:
+            # 检查目录是否存在
+            directory = os.path.dirname(filename)
+            if not os.path.exists(directory) and directory:
+                os.makedirs(directory)
+
+            # 保存图像
+            cv2.imwrite(filename, self.last_screen)
+            print(f"success img: {filename}")
+        else:
+            print("No frame available to save.")
 
 # if __name__ == '__main__':

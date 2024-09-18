@@ -14,17 +14,17 @@ battle_num = 0
 # 选择其他地下城
 select_other_dxc = [2078, 240]
 # 点击冒险
-adventure = []
+adventure = [2072, 984]
 # 点击冒险奖励
-adventure_award = []
+adventure_award = [2072, 984]
 # 点击冒险级
-adventure_level = []
+adventure_level = [870, 258]
 # 点击区域移动
-area_move = []
+area_move = [1877, 714]
 # 点击布万加地图
-bwj_map = []
+bwj_map = [1636, 812]
 # 战斗开始
-combat_start = []
+combat_start = [1934, 935]
 # 点击返回城镇
 return_city = []
 # 角色1
