@@ -14,7 +14,7 @@ from end_time import TimeTracker
 import random
 from test import take_screenshot_async
 from ii import is_brightness_low
-
+from send.send_email import send_email_with_attachment
 
 def click_img_coordinate(control, current_screen_img, image_path, gray_convert=1, t=1):
     take_screenshot()
@@ -377,7 +377,8 @@ class GameAction:
             # else:
             print("等待时间超时，返回城镇")
             # 微信公众号提醒
-            send_miao_reminder("等待时间超时，返回城镇")
+            # send_miao_reminder("等待时间超时，返回城镇")
+            send_email_with_attachment("DNF刷图信息", "等待时间超时，返回城镇", ["current_screen_img.jpg"])
             # self.stop_event = True
             self.detect_retry = False
             # self.detect_retry = True
@@ -670,7 +671,9 @@ class GameAction:
                     sv.battle_num = sv.battle_num + 1
                     tracker.stop()
                     time_consuming = tracker.calculate_duration(subtract_seconds=32)
-                    send_miao_reminder(f"英雄名称: {sv.role_dic[sv.hero_num]},第{sv.battle_num}轮战斗，战斗耗时:{time_consuming}")
+                    message = f"英雄名称: {sv.role_dic[sv.hero_num]},第{sv.battle_num}轮战斗，战斗耗时:{time_consuming}"
+                    # send_miao_reminder(message)
+                    send_email_with_attachment("DNF刷图信息", message, ["current_screen_img.jpg"])
                     # 重置时间
                     tracker.reset()
                     time.sleep(1)  # 等待1秒
@@ -683,8 +686,6 @@ class GameAction:
                         time.sleep(2)
                         if find_best_match_2(sv.current_screen_img,
                                              r"./img/underground_file/kuang.jpg") is not None:
-                            # if find_best_match(self.queue.get()[0], r"./img/qr.jpg") is not None:
-                            #     self.ctrl.click(1317, 675)
                             click_img_coordinate(self.ctrl, sv.current_screen_img,
                                                  r"./img/underground_file/kuang.jpg")
                             click_img_coordinate(self.ctrl, sv.current_screen_img, r"img/underground_file/qr.jpg")
