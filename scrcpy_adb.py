@@ -7,8 +7,9 @@ import os
 class ScrcpyADB:
     def __init__(self, image_queue, max_fps=30):
         devices = adb.device_list()  # 获取连接的设备列表
-        # client = scrcpy.Client(device=devices[0], max_fps=max_fps, block_frame=True)
-        client = scrcpy.Client(device=devices[0], max_fps=max_fps, block_frame=True, max_width=2416)  # 初始化scrcpy客户端
+        self.device = devices[0]
+        client = scrcpy.Client(self.device, max_fps=max_fps, block_frame=True)
+        # client = scrcpy.Client(device=devices[0], max_fps=max_fps, block_frame=True, max_width=2416)  # 初始化scrcpy客户端
         print(devices, client)  # 打印设备列表和客户端信息
         client.add_listener(scrcpy.EVENT_FRAME, self.on_frame)  # 添加帧事件监听器
         client.start(threaded=True)  # 启动客户端，使用线程

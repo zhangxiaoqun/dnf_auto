@@ -142,10 +142,10 @@ def switch_hero(control, hero_img):
             print("角色切换成功")
         else:
             # 修理装备
-            # repair_equipment_and_sell_equipment(control)
-            # # 进布万加地图
-            # bwj(control)
-            # print("执行布万家前置步骤，1.修理装备 2.进入地图")
+            repair_equipment_and_sell_equipment(control)
+            # 进布万加地图
+            bwj(control)
+            print("执行布万家前置步骤，1.修理装备 2.进入地图")
             break
 
 
@@ -315,6 +315,8 @@ class GameAction:
         self.stop_event = threading.Event()  # 使用 Event 来控制线程停止
         self.reset_event = threading.Event()  # 同样使用 Event 来控制重置信号
         self.control_attack = HeroController(ctrl)  # 初始化攻击控制
+        # 加载技能模板
+        self.control_attack.load_skills()
         self.room_num = -1  # 当前房间号
         self.timing_time = None
         self.buwanjia = [8, 10, 10, 11, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10]
@@ -440,7 +442,7 @@ class GameAction:
                 if self.pre_state == False:
                     if not self.pre_state:
                         print("过图")  # 通知过图
-                        # time.sleep(0.8)
+                        # time.sleep(0.3)
                         last_room_pos = hero_track[0]  # 保存最后位置
                         hero_track = deque()  # 重置英雄轨迹
                         hero_track.appendleft([1 - last_room_pos[0], 1 - last_room_pos[1]])  # 记录反方向
@@ -475,7 +477,11 @@ class GameAction:
             angle = 0
             outprint = ''
             if self.pre_state == True :
+                # print("len(hero)111111111", len(hero))
+                # time.sleep(0.3)
                 if len(hero) > 0:#记录房间号
+                # if find_best_match_2(image, r"./img/underground_file/xiao_map.jpg") is not None:
+                #     print("len(hero)2222222", len(hero))
                     self.room_num += 1
                     self.pre_state = False
                     print("房间号：",self.room_num)
@@ -565,16 +571,16 @@ class GameAction:
                     role_sx = sv.role_seq_coord
                     # 魔道
                     if sv.hero_num == 2:
-                        sv.hero_skill_num = 2
                         time.sleep(12)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
                         print("点击选角")
                         self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
                         time.sleep(12)
+                        # 加载技能模板
+                        self.control_attack.load_skills()
                     # 大雷给奶一口
                     elif sv.hero_num == 3:
-                        sv.hero_skill_num = 3
                         # switch_hero(self.ctrl, heros["大雷给奶一口"])
                         time.sleep(12)
                         # 左上角选角
@@ -582,10 +588,10 @@ class GameAction:
                         print("点击选角")
                         self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
                         time.sleep(12)
-
+                        # 加载技能模板
+                        self.control_attack.load_skills()
                     # 奶你
                     elif sv.hero_num == 4:
-                        sv.hero_skill_num = 4
                         time.sleep(12)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
@@ -593,19 +599,21 @@ class GameAction:
                         time.sleep(4)
                         self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
                         time.sleep(12)
+                        # 加载技能模板
+                        self.control_attack.load_skills()
                     # 大雷是啥子
                     elif sv.hero_num == 5:
-                        sv.hero_skill_num = 5
                         time.sleep(12)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
                         print("点击选角")
                         self.ctrl.click(role_sx["role_index1"][0], role_sx["role_index1"][1])
                         time.sleep(12)
+                        # 加载技能模板
+                        self.control_attack.load_skills()
 
                     # 剑宗
                     elif sv.hero_num == 6:
-                        sv.hero_skill_num = 6
                         time.sleep(12)
                         # 左上角选角
                         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
@@ -615,9 +623,25 @@ class GameAction:
                         time.sleep(6)
                         self.ctrl.click(role_sx["role_index3"][0], role_sx["role_index3"][1])
                         time.sleep(12)
-                    # 踹你一脚气
+                        # 加载技能模板
+                        self.control_attack.load_skills()
+
+                    # 剑豪
+                    elif sv.hero_num == 7:
+                        time.sleep(12)
+                        # 左上角选角
+                        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
+                        print("点击选角")
+                        # 滑动角色
+                        self.ctrl.slide(208, 524, "up", distance=400)
+                        time.sleep(6)
+                        self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
+                        time.sleep(12)
+                        # 加载技能模板
+                        self.control_attack.load_skills()
+
+                    # # 踹你一脚气
                     # elif sv.hero_num == 8:
-                    #     sv.hero_skill_num = 8
                     #     time.sleep(12)
                     #     # 左上角选角
                     #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=4)
@@ -627,6 +651,9 @@ class GameAction:
                     #     time.sleep(6)
                     #     self.ctrl.click(role_sx["role_index3"][0], role_sx["role_index3"][1])
                     #     time.sleep(12)
+                    #     # 加载技能模板
+                    #     self.control_attack.load_skills()
+
                     # 修理装备
                     repair_equipment_and_sell_equipment(self.ctrl)
                     bwj(self.ctrl)

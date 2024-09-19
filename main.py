@@ -31,23 +31,6 @@ class AutoCleaningQueue(queue.Queue):
         super().put(item, block, timeout)  # 调用父类的put方法
 
 
-def initialize_game_control(client):
-    """根据 hero_num 初始化 GameControl 实例"""
-    if sv.hero_skill_num == 3 or sv.hero_skill_num == 4:
-        skill_path = "./role_skill/naima.json"
-    elif sv.hero_num == 5:
-        skill_path = "./role_skill/kuangzhanshi.json"
-    else:
-        skill_path = "./role_skill/naima.json"  # 默认技能路径
-
-    return GameControl(client, os.path.join(current_dir, skill_path))
-skill_paths = {
-        1: os.path.join(os.getcwd(), "./role_skill/naima.json"),
-        2: os.path.join(os.getcwd(), "./role_skill/naima.json"),
-        3: os.path.join(os.getcwd(), "./role_skill/kuangzhanshi.json"),
-    }
-
-
 if __name__ == '__main__':
     image_queue = AutoCleaningQueue(maxsize=3)
     infer_queue = AutoCleaningQueue(maxsize=3)
@@ -64,26 +47,12 @@ if __name__ == '__main__':
     # 使用指定的技能 JSON 配置初始化 GameControl
     # control = GameControl(client, os.path.join(current_dir, "./skill.json"))
     # control = GameControl(client, os.path.join(current_dir, "./skill_biaozhun_xiaomi.json"))
-    control = GameControl(client, os.path.join(current_dir, "./skill_jichu_huawei.json"))
+    # control = GameControl(client, os.path.join(current_dir, "skill_jichu_huawei.json"))
+    control = GameControl(client, os.path.join(current_dir, "hero/hero_skill/test_skill.json"))
 
     # 创建 GameAction 实例以处理游戏中的操作
     action = GameAction(control, infer_queue)
-
-    # last_hero_skill_num = sv.hero_skill_num
-    while True:
-        # 在主循环中根据需要重新初始化 GameControl
-        # if sv.hero_skill_num != last_hero_skill_num:  # 检查英雄编号是否发生变化
-        #     # action.thread_run = False
-        #     control = initialize_game_control(client)
-        #     # if action is not None:
-        #     #     action.stop_event = True  # 停止当前动作
-        #     print(f"3当前活动线程数: {threading.active_count()}")
-        #     action.stop_event = True
-        #     # action.thread_run = False
-        #     action.thread_run = True
-        #     # action.reset()
-        #     action = GameAction(control, infer_queue)  # 重新创建 GameAction
-        #     last_hero_skill_num = sv.hero_skill_num  # 更新最后的英雄编号
+    while True:         # 在主循环中根据需要重新初始化 GameControl
         if show_queue.empty():  # 如果显示队列为空
             time.sleep(0.001)   # 等待微秒
             continue
