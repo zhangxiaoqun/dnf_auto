@@ -13,7 +13,6 @@ from datetime import datetime, timedelta
 from end_time import TimeTracker
 import random
 from test import take_screenshot_async
-from ii import is_brightness_low
 from send.send_email import send_email_with_attachment
 
 def click_img_coordinate(control, current_screen_img, image_path, gray_convert=1, t=1):
@@ -149,6 +148,24 @@ def switch_hero(control, hero_img):
             break
 
 
+def is_brightness_low(image, region, threshold):
+    """
+    判断图像中指定区域的平均亮度是否低于阈值。
+
+    :param image: 输入图像 (NumPy 数组)
+    :param region: 区域，格式为 (起始y, 终止y, 起始x, 终止x)
+    :param threshold: 平均亮度的阈值
+    :return: 是否低于阈值（布尔值）
+    """
+    # 提取指定区域
+    y_start, y_end, x_start, x_end = region
+    sub_image = image[y_start:y_end, x_start:x_end]
+
+    # 计算区域的平均亮度
+    mean_brightness = np.mean(sub_image)
+
+    # 判断平均亮度是否大于阈值
+    return mean_brightness > threshold
 
 def calculate_center(box):# 计算矩形框的底边中心点坐标
     return ((box[0] + box[2]) / 2, box[3])
@@ -319,7 +336,7 @@ class GameAction:
         self.control_attack.load_skills()
         self.room_num = -1  # 当前房间号
         self.timing_time = None
-        self.buwanjia = [8, 10, 10, 11, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+        self.buwanjia = [8, 10, 10, 11, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         self.buwanjia_sanda = [8, 10, 10, 11, 11, 10, 10, 10, 10, 10, 10, 10, 10, 10]
         self.adventure_start_time = None  # 冒险开始时间
         self.adventure_duration = 15 # 冒险持续时间（5分钟）
@@ -480,9 +497,11 @@ class GameAction:
             if self.pre_state == True :
                 # print("len(hero)111111111", len(hero))
                 # time.sleep(0.3)
-                if len(hero) > 0:#记录房间号
+                # if len(hero) > 0:#记录房间号
                 # if find_best_match_2(image, r"./img/underground_file/xiao_map.jpg") is not None:
                 #     print("len(hero)2222222", len(hero))
+                region_to_check = (46, 171, 1684, 1812)
+                if is_brightness_low(image, region_to_check, threshold=40.55):
                     self.room_num += 1
                     self.pre_state = False
                     print("房间号：",self.room_num)
