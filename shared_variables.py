@@ -3,10 +3,10 @@ hero_num = 1  # 初始化hero_num变量
 # 截取图片路径
 current_screen_img = "./current_screen_img.jpg"
 # 技能模板
-hero_skill_num = 1
+hero_skill_num = 5
 # skill_path = ""
 # 技能名称
-skill_name_path = "test_skill.json"
+# skill_name_path = "common_skill.json"
 # 进入地下城满300疲劳提示
 pl_300_message_num = 0
 # 战斗次数

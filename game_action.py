@@ -150,7 +150,7 @@ def switch_hero(control, hero_img):
 
 def is_brightness_low(image, region, threshold):
     """
-    判断图像中指定区域的平均亮度是否低于阈值。
+    判断图像中指定区域的平均亮度是否高于阈值。
 
     :param image: 输入图像 (NumPy 数组)
     :param region: 区域，格式为 (起始y, 终止y, 起始x, 终止x)
@@ -435,13 +435,13 @@ class GameAction:
         tracker = TimeTracker()
         tracker.start()
 
-        from threading import Thread
-        screenshot_interval = 7  # 设置截图间隔为 3 秒
-
-        # 在一个新的线程中开始定期截图
-        screenshot_thread = Thread(target=take_screenshot_async, args=(screenshot_interval,))
-        screenshot_thread.daemon = True  # 允许线程在主程序退出时也能退出
-        screenshot_thread.start()
+        # from threading import Thread
+        # screenshot_interval = 7  # 设置截图间隔为 7 秒
+        #
+        # # 在一个新的线程中开始定期截图
+        # screenshot_thread = Thread(target=take_screenshot_async, args=(screenshot_interval,))
+        # screenshot_thread.daemon = True  # 允许线程在主程序退出时也能退出
+        # screenshot_thread.start()
 
 
         while self.thread_run:  # 循环执行
@@ -460,7 +460,6 @@ class GameAction:
                 if self.pre_state == False:
                     if not self.pre_state:
                         print("过图")  # 通知过图
-                        # time.sleep(0.3)
                         last_room_pos = hero_track[0]  # 保存最后位置
                         hero_track = deque()  # 重置英雄轨迹
                         hero_track.appendleft([1 - last_room_pos[0], 1 - last_room_pos[1]])  # 记录反方向
@@ -495,11 +494,7 @@ class GameAction:
             angle = 0
             outprint = ''
             if self.pre_state == True :
-                # print("len(hero)111111111", len(hero))
-                # time.sleep(0.3)
                 # if len(hero) > 0:#记录房间号
-                # if find_best_match_2(image, r"./img/underground_file/xiao_map.jpg") is not None:
-                #     print("len(hero)2222222", len(hero))
                 region_to_check = (46, 171, 1684, 1812)
                 if is_brightness_low(image, region_to_check, threshold=40.55):
                     self.room_num += 1
@@ -563,7 +558,13 @@ class GameAction:
                 self.ctrl.attack(False)
             elif self.detect_retry == True:
                 #重新挑战：自行发挥
-                # print("detect_retry")
+                print("detect_retry")
+                # 检查是否要修理装备
+                take_screenshot()
+                if find_best_match_2(sv.current_screen_img, r"./img/underground_file/zhuangbeixiuli1.jpg") is not None:
+                    click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/zhuangbeixiuli1.jpg")
+                    click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/xiulizhuangbei.jpg")
+                    click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/close_xiuli.jpg")
                 heros = {"大雷给奶一口":r"./img/role/nai1.jpg", "别拽了俺tuo":r"./img/role/bie2.jpg", "大雷是啥子":r"./img/role/kuang3.jpg"}
                 # 选择其他地下城
                 # self.ctrl.click(2078, 240)
