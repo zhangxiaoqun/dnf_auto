@@ -4,15 +4,16 @@ import subprocess
 import ast
 import time
 
-from PyQt5.QtCore import QThread, pyqtSignal, QSize, Qt
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout,
     QPushButton, QTextEdit, QLineEdit,
-    QTabWidget, QFormLayout, QComboBox, QMessageBox, QSizePolicy
+    QTabWidget, QFormLayout, QComboBox, QMessageBox, QGridLayout
 )
-
+from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QGridLayout,
+                             QPushButton, QLineEdit, QTextEdit, QMessageBox, QLabel)
 import ctypes
-from img.find_img import take_screenshot  # 导入 helper.py 文件
+from img.find_img import take_screenshot  # 导入帮助函数
 
 class Worker(QThread):
     output_signal = pyqtSignal(str)
@@ -20,7 +21,6 @@ class Worker(QThread):
     def __init__(self):
         super().__init__()
         self.process = None
-
 
     def run(self):
         try:
@@ -50,27 +50,29 @@ class Worker(QThread):
 class App(QWidget):
     def __init__(self):
         super().__init__()
-        self.initUI()
+        self.json_file_path = 'hero/hero_skill/common_skill.json'  # 设置要修改的 JSON 文件路径
         self.worker = None
+        self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("dnf参数修改")
-        self.setGeometry(100, 100, 2400, 1400)
+        self.setWindowTitle("DNF参数修改")
+        self.setGeometry(100, 100, 800, 600)
 
         layout = QVBoxLayout()
         self.tabs = QTabWidget(self)
 
         # 添加 JSON 修改标签
-        self.json_tab = QWidget()
-        self.setup_json_tab()
-        self.tabs.addTab(self.json_tab, "技能坐标修改")
+        self.skill_coord_tab = QWidget()
+        self.setup_skill_coord_tab()
+        # layout.addWidget(self.skill_coord_tab, "技能坐标修改")
+        self.tabs.addTab(self.skill_coord_tab, "技能坐标修改")
 
         # 创建主功能标签页
         self.main_tab = QWidget()
         self.setup_main_tab()
         self.tabs.addTab(self.main_tab, "运行功能")
 
-        # 创建其他变量修改标签页
+        # 创建变量修改标签页
         self.variable_tab = QWidget()
         self.setup_variable_tab()
         self.tabs.addTab(self.variable_tab, "修改变量")
@@ -88,12 +90,11 @@ class App(QWidget):
         self.setup_game_tab()
         self.tabs.addTab(self.game_tab, "游戏窗口")
 
-    def setup_json_tab(self):
-        layout = QFormLayout()
+    def setup_skill_coord_tab(self):
+        layout = QGridLayout()
+        layout.setSpacing(10)
 
         self.key_name_mapping = {
-            "joystick.center": "操纵杆中心",
-            "joystick.radius": "操纵杆半径",
             "attack": "攻击",
             "Jump_Back": "后跳",
             "Jump": "跳跃",
@@ -116,33 +117,97 @@ class App(QWidget):
             "skill16": "技能16"
         }
 
-        self.keys = list(self.key_name_mapping.keys())
-        self.key_selector = QComboBox(self)
-        self.key_selector.addItems(self.key_name_mapping.values())
+        self.skill_coords = {}
+        self.load_json_data()  # 加载 JSON 数据
 
-        self.json_value_input = QLineEdit(self)
-        self.json_value_input.setPlaceholderText("输入新值（格式: [值1, 值2]）")
+        row = 0
+        col = 0
 
-        get_value_button = QPushButton("获取当前值", self)
-        get_value_button.clicked.connect(self.get_current_value)
+        for skill_key, skill_name in self.key_name_mapping.items():
+            x_input = QLineEdit(self)
+            y_input = QLineEdit(self)
+            x_input.setPlaceholderText("输入 X 坐标")
+            y_input.setPlaceholderText("输入 Y 坐标")
 
-        modify_button = QPushButton("修改 JSON 值", self)
-        modify_button.clicked.connect(self.modify_json_value)
+            # 注释掉 QIntValidator，允许输入字母和数字
+            # x_input.setValidator(QIntValidator())
+            # y_input.setValidator(QIntValidator())
 
-        self.textEdit = QTextEdit(self)
-        self.textEdit.setReadOnly(True)
+            if skill_key in self.skill_data:
+                coords = self.skill_data[skill_key]
+                if isinstance(coords, list) and len(coords) >= 2:
+                    x_input.setText(str(coords[0]))
+                    y_input.setText(str(coords[1]))
 
-        layout.addRow("选择键:", self.key_selector)
-        layout.addRow("输入新值:", self.json_value_input)
-        layout.addRow(get_value_button)
-        layout.addRow(modify_button)
-        layout.addRow(self.textEdit)
+            self.skill_coords[skill_key] = (x_input, y_input)
 
-        self.json_tab.setLayout(layout)
+            layout.addWidget(QLabel(skill_name), row, col)
+            layout.addWidget(x_input, row, col + 1)
+            layout.addWidget(y_input, row, col + 2)
+
+            col += 3  # 每个技能占三列
+            if col >= 6:  # 如果超过两列则换行
+                col = 0
+                row += 1
+
+        self.modify_skills_button = QPushButton("修改技能坐标", self)
+        self.modify_skills_button.clicked.connect(self.modify_skill_coords)
+
+        layout.addWidget(self.modify_skills_button, row + 1, 0, 1, 3)  # 按钮放在底部
+        self.output_text = QTextEdit(self)
+        self.output_text.setReadOnly(True)
+        layout.addWidget(self.output_text, row + 2, 0, 1, 3)  # 输出框放在按钮下
+
+        self.skill_coord_tab.setLayout(layout)
+
+    def load_json_data(self):
+        try:
+            with open(self.json_file_path, 'r', encoding='utf-8') as file:
+                self.skill_data = json.load(file)
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"加载 JSON 数据时出错：\n{str(e)}")
+
+    def modify_skill_coords(self):
+        skill_coords = {}
+        valid_input = True
+
+        for skill_key, (x_input, y_input) in self.skill_coords.items():
+            x = x_input.text().strip()  # 去掉前后空格
+            y = y_input.text().strip()
+
+            print(f"Debug: {skill_key} - X: '{x}', Y: '{y}'")  # 调试输出
+
+            # 判断输入并分别处理
+            if x.isdigit() and y.isdigit():
+                skill_coords[skill_key] = [int(x), int(y)]
+            elif x == '' or y == '':
+                valid_input = False
+                QMessageBox.critical(self, "错误", f"{self.key_name_mapping[skill_key]} 的坐标输入无效！X 和 Y 不能为空。")
+                break
+            else:
+                skill_coords[skill_key] = [x, y]  # 如果是字母，直接存储字符串
+
+        if valid_input:
+            # 保存修改到 JSON 文件
+            try:
+                for key, coords in skill_coords.items():
+                    self.skill_data[key] = coords
+
+                with open(self.json_file_path, 'w', encoding='utf-8') as file:
+                    json.dump(self.skill_data, file, ensure_ascii=False, indent=4)
+
+                self.output_text.clear()
+                for skill_key, coords in skill_coords.items():
+                    self.output_text.append(f"{self.key_name_mapping[skill_key]} 坐标已修改为: X = {coords[0]}, Y = {coords[1]}")
+            except Exception as e:
+                QMessageBox.critical(self, "错误", f"保存 JSON 数据时出错：\n{str(e)}")
+
+
+
+
 
     def setup_call_method_tab(self):
         layout = QVBoxLayout()
-
         call_method_button = QPushButton("点击截图", self)
         call_method_button.clicked.connect(self.screenshot)
 
@@ -205,123 +270,80 @@ class App(QWidget):
         layout.addRow(modify_variable_button)
         layout.addRow(self.variable_output_text)
 
-        # 添加角色字典
-        self.role_dic_value_input = QLineEdit(self)
-        self.role_dic_value_input.setPlaceholderText("输入新角色字典（例如: {1:'新角色'}）")
+        # 角色字典输入
+        self.role_dict_grid = QGridLayout()
+        self.role_dict_inputs = []
 
-        modify_role_dic_button = QPushButton("修改角色字典", self)
-        modify_role_dic_button.clicked.connect(self.modify_role_dic)
+        self.add_role_dict_button = QPushButton("添加角色字典输入框", self)
+        self.add_role_dict_button.clicked.connect(self.add_role_dict_input)
 
-        self.role_dic_output_text = QTextEdit(self)
-        self.role_dic_output_text.setReadOnly(True)
+        modify_role_dict_button = QPushButton("修改角色字典", self)
+        modify_role_dict_button.clicked.connect(self.modify_role_dict)
 
-        layout.addRow("输入新角色字典:", self.role_dic_value_input)
-        layout.addRow(modify_role_dic_button)
-        layout.addRow(self.role_dic_output_text)
+        self.role_dict_output_text = QTextEdit(self)
+        self.role_dict_output_text.setReadOnly(True)
 
-        # 添加角色顺序坐标
-        self.role_seq_coord_value_input = QLineEdit(self)
-        self.role_seq_coord_value_input.setPlaceholderText("输入新角色顺序坐标（例如: {'role_index1': [100, 200]}）")
+        layout.addRow(self.add_role_dict_button)
+        layout.addRow(modify_role_dict_button)  # 添加修改按钮
+        layout.addRow(self.role_dict_output_text)
 
-        modify_role_seq_coord_button = QPushButton("修改角色顺序坐标", self)
-        modify_role_seq_coord_button.clicked.connect(self.modify_role_seq_coord)
+        layout.addRow(self.role_dict_grid)
 
-        self.role_seq_coord_output_text = QTextEdit(self)
-        self.role_seq_coord_output_text.setReadOnly(True)
 
-        layout.addRow("输入新角色顺序坐标:", self.role_seq_coord_value_input)
-        layout.addRow(modify_role_seq_coord_button)
-        layout.addRow(self.role_seq_coord_output_text)
+        # 角色坐标顺序（固定的）
+        self.role_seq_coord = {
+            "role_index1": [202, 177],
+            "role_index2": [201, 298],
+            "role_index3": [205, 420],
+            "role_index4": [196, 532]
+        }
+
+        self.role_seq_inputs = {}
+        for role, coord in self.role_seq_coord.items():
+            x_input = QLineEdit(self)
+            y_input = QLineEdit(self)
+            x_input.setText(str(coord[0]))  # 设置 X 坐标初始值
+            y_input.setText(str(coord[1]))  # 设置 Y 坐标初始值
+            self.role_seq_inputs[role] = (x_input, y_input)
+
+            layout.addRow(f"{role} X 坐标:", x_input)
+            layout.addRow(f"{role} Y 坐标:", y_input)
+
+        modify_role_seq_button = QPushButton("修改角色顺序坐标", self)
+        modify_role_seq_button.clicked.connect(self.modify_role_seq_coord)
+        layout.addRow(modify_role_seq_button)
+
+        self.role_seq_output_text = QTextEdit(self)
+        self.role_seq_output_text.setReadOnly(True)
+        layout.addRow(self.role_seq_output_text)
 
         self.variable_tab.setLayout(layout)
 
-    def get_current_value(self):
-        json_file_path = 'data.json'
-        key = self.keys[self.key_selector.currentIndex()]
 
-        try:
-            with open(json_file_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
+    def add_role_dict_input(self):
+        row = len(self.role_dict_inputs)
+        key_input = QLineEdit(self)
+        key_input.setPlaceholderText("输入角色键")
+        value_input = QLineEdit(self)
+        value_input.setPlaceholderText("输入角色值")
 
-            current_value = self.get_nested_value(data, key)
-            msg = f"当前 '{key}' 的值为: '{current_value}'"
-            print(msg)
-            self.textEdit.append(msg)
-            self.json_value_input.setText(str(current_value))
-        except Exception as e:
-            QMessageBox.critical(self, "错误", f"获取 JSON 值时出错：\n{str(e)}")
+        self.role_dict_inputs.append((key_input, value_input))
+        self.role_dict_grid.addWidget(key_input, row // 3, 2 * (row % 3))  # 键
+        self.role_dict_grid.addWidget(value_input, row // 3, 2 * (row % 3) + 1)  # 值
 
-    def get_nested_value(self, data, key):
-        keys = key.split('.')
-        for k in keys:
-            data = data[k]
-        return data
+    def add_role_seq_input(self):
+        row = len(self.role_seq_inputs)
+        key_input = QLineEdit(self)
+        key_input.setPlaceholderText("输入角色坐标键")
+        x_input = QLineEdit(self)
+        x_input.setPlaceholderText("输入 X 坐标")
+        y_input = QLineEdit(self)
+        y_input.setPlaceholderText("输入 Y 坐标")
 
-    def modify_json_value(self):
-        json_file_path = 'data.json'
-        key = self.keys[self.key_selector.currentIndex()]
-        new_value = self.json_value_input.text()
-
-        try:
-            if new_value.startswith('[') and new_value.endswith(']'):
-                new_value = json.loads(new_value)
-            else:
-                raise ValueError("输入格式错误，需为列表格式，例如 [2096, 968]")
-
-            if not isinstance(new_value, list):
-                raise ValueError("新值必须为一个列表。")
-
-            with open(json_file_path, 'r', encoding='utf-8') as file:
-                data = json.load(file)
-
-            keys = key.split('.')
-            if len(keys) > 1:
-                nested_key = keys[-1]
-                parent_key = keys[:-1]
-
-                parent_data = data
-                for k in parent_key:
-                    parent_data = parent_data[k]
-
-                parent_data[nested_key] = new_value
-            else:
-                data[key] = new_value
-
-            with open(json_file_path, 'w', encoding='utf-8') as file:
-                json.dump(data, file, ensure_ascii=False, indent=4)
-
-            msg = f"已将 '{key}' 修改为 '{new_value}'"
-            print(msg)
-            self.textEdit.append(msg)
-
-        except ValueError as ve:
-            QMessageBox.critical(self, "错误", f"输入格式错误：\n{str(ve)}")
-        except Exception as e:
-            QMessageBox.critical(self, "错误", f"修改 JSON 时出错：\n{str(e)}")
-
-    def run_main_file(self):
-        self.worker = Worker()
-        self.worker.output_signal.connect(self.output_text.append)
-        self.worker.start()
-
-    def terminate_worker(self):
-        if self.worker:
-            self.worker.terminate_process()
-            self.worker.quit()
-            self.worker.wait()
-            self.worker = None
-
-            self.output_text.append("工作线程已终止。")
-        else:
-            self.output_text.append("没有运行中的线程。")
-
-    def closeEvent(self, event):
-        if self.worker:
-            self.worker.terminate_process()
-            self.worker.quit()
-            self.worker.wait()
-
-        event.accept()
+        self.role_seq_inputs.append((key_input, x_input, y_input))
+        self.role_seq_grid.addWidget(key_input, row // 3, 3 * (row % 3))  # 键
+        self.role_seq_grid.addWidget(x_input, row // 3, 3 * (row % 3) + 1)  # X坐标
+        self.role_seq_grid.addWidget(y_input, row // 3, 3 * (row % 3) + 2)  # Y坐标
 
     def modify_variable(self):
         shared_file_path = 'shared_variables.py'
@@ -353,23 +375,24 @@ class App(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "错误", f"修改变量时出错：\n{str(e)}")
 
-    def modify_role_dic(self):
+    def modify_role_dict(self):
         shared_file_path = 'shared_variables.py'
-        new_value = self.role_dic_value_input.text()
+        role_dict = {}
 
+        for key_input, value_input in self.role_dict_inputs:
+            key = key_input.text()
+            value = value_input.text()
+            if key.isdigit() and value:  # 确保键为数字，值不能为空
+                role_dict[int(key)] = value  # 将键转换为 int
+
+        # 保存角色字典到 shared_variables.py
         try:
             with open(shared_file_path, 'r', encoding='utf-8') as file:
                 lines = file.readlines()
 
             for i, line in enumerate(lines):
-                if line.startswith("role_dic = "):
-                    try:
-                        parsed_value = ast.literal_eval(new_value)
-                        if not isinstance(parsed_value, dict):
-                            raise ValueError("角色字典必须是字典格式。")
-                        lines[i] = f"role_dic = {repr(parsed_value)}\n"
-                    except Exception as e:
-                        raise ValueError(f"无效的新角色字典：{new_value}") from e
+                if line.startswith("role_dic = "):  # 这里需要确保变量名是 role_dic
+                    lines[i] = f"role_dic = {repr(role_dict)}\n"
                     break
             else:
                 raise ValueError("未找到角色字典变量。")
@@ -377,30 +400,31 @@ class App(QWidget):
             with open(shared_file_path, 'w', encoding='utf-8') as file:
                 file.writelines(lines)
 
-            msg = f"角色字典已修改为 '{new_value}'"
+            msg = f"角色字典已修改为 '{role_dict}'"
             print(msg)
-            self.role_dic_output_text.append(msg)
+            self.role_dict_output_text.append(msg)
 
         except Exception as e:
             QMessageBox.critical(self, "错误", f"修改角色字典时出错：\n{str(e)}")
 
     def modify_role_seq_coord(self):
-        shared_file_path = 'shared_variables.py'
-        new_value = self.role_seq_coord_value_input.text()
+        shared_file_path = 'shared_variables.py'  # 替换为实际文件路径
+        role_seq_coord = {}
 
+        for role, (x_input, y_input) in self.role_seq_inputs.items():
+            x = x_input.text()
+            y = y_input.text()
+            if x.isdigit() and y.isdigit():
+                role_seq_coord[role] = [int(x), int(y)]
+
+        # 保存角色顺序坐标到 shared_variables.py
         try:
             with open(shared_file_path, 'r', encoding='utf-8') as file:
                 lines = file.readlines()
 
             for i, line in enumerate(lines):
                 if line.startswith("role_seq_coord = "):
-                    try:
-                        parsed_value = ast.literal_eval(new_value)
-                        if not isinstance(parsed_value, dict):
-                            raise ValueError("角色顺序坐标必须是字典格式。")
-                        lines[i] = f"role_seq_coord = {repr(parsed_value)}\n"
-                    except Exception as e:
-                        raise ValueError(f"无效的新角色顺序坐标：{new_value}") from e
+                    lines[i] = f"role_seq_coord = {repr(role_seq_coord)}\n"
                     break
             else:
                 raise ValueError("未找到角色顺序坐标变量。")
@@ -408,40 +432,58 @@ class App(QWidget):
             with open(shared_file_path, 'w', encoding='utf-8') as file:
                 file.writelines(lines)
 
-            msg = f"角色顺序坐标已修改为 '{new_value}'"
+            msg = f"角色顺序坐标已修改为 '{role_seq_coord}'"
             print(msg)
-            self.role_seq_coord_output_text.append(msg)
+            self.role_seq_output_text.append(msg)
+
 
         except Exception as e:
             QMessageBox.critical(self, "错误", f"修改角色顺序坐标时出错：\n{str(e)}")
 
+    def run_main_file(self):
+        self.worker = Worker()
+        self.worker.output_signal.connect(self.output_text.append)
+        self.worker.start()
+
+    def terminate_worker(self):
+        if self.worker:
+            self.worker.terminate_process()
+            self.worker.quit()
+            self.worker.wait()
+            self.worker = None
+
+            self.output_text.append("工作线程已终止。")
+        else:
+            self.output_text.append("没有运行中的线程。")
+
+    def closeEvent(self, event):
+        if self.worker:
+            self.worker.terminate_process()
+            self.worker.quit()
+            self.worker.wait()
+
+        event.accept()
+
     def setup_game_tab(self):
         layout = QVBoxLayout()
-
         game_handle = self.get_game_window_handle()
 
         if game_handle:
-            # 创建 QWidget 作为容器
             game_widget = QWidget(self)
             layout.addWidget(game_widget)
 
-            # 设置 QWidget 的几何和样式
             game_widget.setGeometry(0, 0, 800, 600)  # 根据需要设置尺寸
             game_widget.setAttribute(Qt.WA_NativeWindow)
 
-            # 获取窗口ID
-            game_widget_id = int(game_widget.winId())  # 将 Qt 窗口 ID 转换为整数
+            game_widget_id = int(game_widget.winId())  # 获取窗口 ID
 
-            # 打印调试信息
             print(f"游戏窗口ID: {game_widget_id}, 游戏句柄: {game_handle}")  # 调试信息
 
-            # 将窗口句柄转换为 CTYPES 的句柄类型
             handle = ctypes.c_void_p(game_handle)  # 游戏窗口句柄
             widget_id = ctypes.c_void_p(game_widget_id)  # Qt 窗口句柄
 
-            # 设置游戏窗口为父窗口
             result = ctypes.windll.user32.SetParent(handle, widget_id)
-            if result == 0:  # 返回值为0表示设置失败
+            if result == 0:
                 print(f"SetParent 失败: {ctypes.GetLastError()}")
 
         else:
@@ -451,14 +493,13 @@ class App(QWidget):
 
     def get_game_window_handle(self):
         time.sleep(5)
-        # 获取游戏窗口句柄，假设窗口标题为 "游戏窗口标题"
-        # hwnd = ctypes.windll.user32.FindWindowW(None, "image")  # 替换为实际窗口标题
         hwnd = ctypes.windll.user32.FindWindowW(None, "Oopz")  # 替换为实际窗口标题
         if hwnd:
             print(f"找到游戏窗口，句柄: {hwnd}")  # 调试信息
         else:
             print("未找到游戏窗口")  # 调试信息
         return hwnd if hwnd else None
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = App()
