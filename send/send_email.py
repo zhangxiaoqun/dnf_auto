@@ -29,21 +29,23 @@ def send_email_with_attachment(subject, body, filenames):
         server.send_message(msg)
         print('邮件发送成功')
 
-# 示例用法
-# # 发送方
-# sender_email = '975924636@qq.com'
-# # 接受方
-# receiver_email = '975924636@qq.com'
-# # 邮件主题
-subject = 'DNF状态'
-# 这是邮件正文部分
-body = '1.'
-# 文件
-filename = ['']
-# # SMTP 服务器
-# smtp_server = 'smtp.qq.com'
-# smtp_port = 25
-# username = '975924636@qq.com'
-# password = 'caaqtrsfslrobbbc'
 
-send_email_with_attachment(subject, body, filename)
+if __name__ == '__main__':
+    # 示例用法
+    # # 发送方
+    # sender_email = '975924636@qq.com'
+    # # 接受方
+    # receiver_email = '975924636@qq.com'
+    # # 邮件主题
+    subject = 'DNF状态'
+    # 这是邮件正文部分
+    body = '1.'
+    # 文件
+    filename = [r'E:\yolo\dnf_auto_test\2.jpg']
+    # # SMTP 服务器
+    # smtp_server = 'smtp.qq.com'
+    # smtp_port = 25
+    # username = '975924636@qq.com'
+    # password = 'caaqtrsfslrobbbc'
+
+    send_email_with_attachment(subject, body, filename)

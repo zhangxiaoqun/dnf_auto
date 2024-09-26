@@ -3,15 +3,12 @@ import json
 import subprocess
 import ast
 import time
-
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout,
     QPushButton, QTextEdit, QLineEdit,
-    QTabWidget, QFormLayout, QComboBox, QMessageBox, QGridLayout
+    QTabWidget, QFormLayout, QComboBox, QMessageBox, QGridLayout, QLabel
 )
-from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QGridLayout,
-                             QPushButton, QLineEdit, QTextEdit, QMessageBox, QLabel)
 import ctypes
 from img.find_img import take_screenshot  # 导入帮助函数
 
@@ -50,7 +47,7 @@ class Worker(QThread):
 class App(QWidget):
     def __init__(self):
         super().__init__()
-        self.json_file_path = 'hero/hero_skill/common_skill.json'  # 设置要修改的 JSON 文件路径
+        self.json_file_path = './hero/hero_skill/common_skill.json'  # 设置要修改的 JSON 文件路径
         self.worker = None
         self.initUI()
 
@@ -64,7 +61,6 @@ class App(QWidget):
         # 添加 JSON 修改标签
         self.skill_coord_tab = QWidget()
         self.setup_skill_coord_tab()
-        # layout.addWidget(self.skill_coord_tab, "技能坐标修改")
         self.tabs.addTab(self.skill_coord_tab, "技能坐标修改")
 
         # 创建主功能标签页
@@ -114,7 +110,7 @@ class App(QWidget):
             "skill13": "技能13",
             "skill14": "技能14",
             "skill15": "技能15",
-            "skill16": "技能16"
+            "skill16": "技能16"  # Add skill16 to the mapping
         }
 
         self.skill_coords = {}
@@ -123,87 +119,144 @@ class App(QWidget):
         row = 0
         col = 0
 
+        # joystick 输入框创建
+        self.joystick_center_x_input = QLineEdit(self)
+        self.joystick_center_y_input = QLineEdit(self)
+        self.joystick_radius_input = QLineEdit(self)
+
+        # 加载已有的 joystick 数据
+        if 'joystick' in self.skill_data:
+            joystick_data = self.skill_data['joystick']
+            if isinstance(joystick_data, dict):
+                center = joystick_data.get('center', [0, 0])
+                radius = joystick_data.get('radius', 0)
+                if len(center) >= 2:
+                    self.joystick_center_x_input.setText(str(center[0]))
+                    self.joystick_center_y_input.setText(str(center[1]))
+                self.joystick_radius_input.setText(str(radius))
+
+        layout.addWidget(QLabel("操纵杆中心X坐标:"), row, 0)
+        layout.addWidget(self.joystick_center_x_input, row, 1)
+        layout.addWidget(QLabel("操纵杆中心Y坐标:"), row, 2)
+        layout.addWidget(self.joystick_center_y_input, row, 3)
+        layout.addWidget(QLabel("操纵杆半径:"), row + 1, 0)
+        layout.addWidget(self.joystick_radius_input, row + 1, 1)
+
+        # 为 skill12 到 skill16 添加输入框
         for skill_key, skill_name in self.key_name_mapping.items():
             x_input = QLineEdit(self)
             y_input = QLineEdit(self)
+
+            if skill_key == "skill16":
+                z_input = QLineEdit(self)
+                z_input.setPlaceholderText("输入 Z 坐标")
+            else:
+                z_input = None  # 对于其他技能，没有 Z 坐标输入框
+
             x_input.setPlaceholderText("输入 X 坐标")
             y_input.setPlaceholderText("输入 Y 坐标")
 
-            # 注释掉 QIntValidator，允许输入字母和数字
-            # x_input.setValidator(QIntValidator())
-            # y_input.setValidator(QIntValidator())
-
+            # 读取 JSON 中的技能坐标
             if skill_key in self.skill_data:
                 coords = self.skill_data[skill_key]
-                if isinstance(coords, list) and len(coords) >= 2:
+                if isinstance(coords, list):
                     x_input.setText(str(coords[0]))
                     y_input.setText(str(coords[1]))
+                    if skill_key == "skill16" and len(coords) == 3:
+                        z_input.setText(str(coords[2]))  # 只有 skill16 有第三个值
+                elif isinstance(coords, str):
+                    x_input.setText(coords)  # X 坐标为字符串
+                    y_input.setText("")  # Y 坐标为空
+                    if z_input:  # 对于 skill16, z_input 应为空
+                        z_input.setText("")
 
-            self.skill_coords[skill_key] = (x_input, y_input)
+            self.skill_coords[skill_key] = (x_input, y_input, z_input)
 
-            layout.addWidget(QLabel(skill_name), row, col)
-            layout.addWidget(x_input, row, col + 1)
-            layout.addWidget(y_input, row, col + 2)
+            layout.addWidget(QLabel(skill_name), row + 2, col)
+            layout.addWidget(x_input, row + 2, col + 1)
+            layout.addWidget(y_input, row + 2, col + 2)
 
-            col += 3  # 每个技能占三列
-            if col >= 6:  # 如果超过两列则换行
+            if z_input:  # 只有 skill16 才会有 z_input
+                layout.addWidget(z_input, row + 2, col + 3)
+
+            col += 4 if z_input else 3  # skill16 用 4 列，其他技能用 3 列
+            if col >= 8:  # 如果超过两列则换行
                 col = 0
                 row += 1
 
+        # 修改按钮创建
         self.modify_skills_button = QPushButton("修改技能坐标", self)
         self.modify_skills_button.clicked.connect(self.modify_skill_coords)
 
-        layout.addWidget(self.modify_skills_button, row + 1, 0, 1, 3)  # 按钮放在底部
+        layout.addWidget(self.modify_skills_button, row + 3, 0, 1, 4)  # 按钮放在底部
         self.output_text = QTextEdit(self)
         self.output_text.setReadOnly(True)
-        layout.addWidget(self.output_text, row + 2, 0, 1, 3)  # 输出框放在按钮下
+        layout.addWidget(self.output_text, row + 4, 0, 1, 4)  # 输出框放在按钮下
 
         self.skill_coord_tab.setLayout(layout)
 
+    def modify_skill_coords(self):
+        skill_coords = {}
+        valid_input = True
+
+        # 修改 joystick 的输入
+        joystick_center_x = self.joystick_center_x_input.text().strip()
+        joystick_center_y = self.joystick_center_y_input.text().strip()
+        joystick_radius = self.joystick_radius_input.text().strip()
+
+        if joystick_center_x.isdigit() and joystick_center_y.isdigit():
+            if joystick_radius.isdigit() and int(joystick_radius) >= 0:
+                skill_coords["joystick"] = {
+                    "center": [int(joystick_center_x), int(joystick_center_y)],
+                    "radius": int(joystick_radius)
+                }
+            else:
+                valid_input = False
+                QMessageBox.critical(self, "错误", "操纵杆的半径无效！请确保输入为非负整数。")
+        elif joystick_center_x == '' or joystick_center_y == '':
+            valid_input = False
+            QMessageBox.critical(self, "错误", "操纵杆的中心坐标输入无效！X 和 Y 不能为空。")
+
+        for skill_key, (x_input, y_input, z_input) in self.skill_coords.items():
+            x = x_input.text().strip()
+            y = y_input.text().strip() if y_input else None  # 检查 y_input 是否存在
+            z = z_input.text().strip() if z_input else None  # 只有 skill16 才有 z_input
+
+            # 处理坐标
+            if x.isdigit() and (y == '' or y.isdigit()):
+                if skill_key == "skill16" and z:  # skill16 需要处理 z 坐标
+                    skill_coords[skill_key] = [int(x), int(y), z] if y else [int(x), z]
+                elif skill_key in ["skill12", "skill13", "skill14", "skill15"]:
+                    skill_coords[skill_key] = [x]  # 将字符串 X 值保存
+                else:
+                    skill_coords[skill_key] = [int(x), int(y)] if y else [int(x)]
+            elif x == '':
+                valid_input = False
+                QMessageBox.critical(self, "错误", f"{self.key_name_mapping[skill_key]} 的坐标输入无效！X 和 Y 不能为空。")
+                break
+
+        if valid_input:
+            try:
+                for key, coords in skill_coords.items():
+                    self.skill_data[key] = coords
+
+                # 保存 JSON 文件
+                with open(self.json_file_path, 'w', encoding='utf-8') as file:
+                    json.dump(self.skill_data, file, ensure_ascii=False, indent=4)
+
+                self.output_text.clear()
+                for skill_key, coords in skill_coords.items():
+                    self.output_text.append(f"{self.key_name_mapping[skill_key]} 坐标已修改为: {coords}")
+            # except Exception as e:
+            #     QMessageBox.critical(self, "错误", f"保存 JSON 数据时出错：\n{str(e)}")
+            except:
+                pass
     def load_json_data(self):
         try:
             with open(self.json_file_path, 'r', encoding='utf-8') as file:
                 self.skill_data = json.load(file)
         except Exception as e:
             QMessageBox.critical(self, "错误", f"加载 JSON 数据时出错：\n{str(e)}")
-
-    def modify_skill_coords(self):
-        skill_coords = {}
-        valid_input = True
-
-        for skill_key, (x_input, y_input) in self.skill_coords.items():
-            x = x_input.text().strip()  # 去掉前后空格
-            y = y_input.text().strip()
-
-            print(f"Debug: {skill_key} - X: '{x}', Y: '{y}'")  # 调试输出
-
-            # 判断输入并分别处理
-            if x.isdigit() and y.isdigit():
-                skill_coords[skill_key] = [int(x), int(y)]
-            elif x == '' or y == '':
-                valid_input = False
-                QMessageBox.critical(self, "错误", f"{self.key_name_mapping[skill_key]} 的坐标输入无效！X 和 Y 不能为空。")
-                break
-            else:
-                skill_coords[skill_key] = [x, y]  # 如果是字母，直接存储字符串
-
-        if valid_input:
-            # 保存修改到 JSON 文件
-            try:
-                for key, coords in skill_coords.items():
-                    self.skill_data[key] = coords
-
-                with open(self.json_file_path, 'w', encoding='utf-8') as file:
-                    json.dump(self.skill_data, file, ensure_ascii=False, indent=4)
-
-                self.output_text.clear()
-                for skill_key, coords in skill_coords.items():
-                    self.output_text.append(f"{self.key_name_mapping[skill_key]} 坐标已修改为: X = {coords[0]}, Y = {coords[1]}")
-            except Exception as e:
-                QMessageBox.critical(self, "错误", f"保存 JSON 数据时出错：\n{str(e)}")
-
-
-
 
 
     def setup_call_method_tab(self):
@@ -289,7 +342,6 @@ class App(QWidget):
 
         layout.addRow(self.role_dict_grid)
 
-
         # 角色坐标顺序（固定的）
         self.role_seq_coord = {
             "role_index1": [202, 177],
@@ -319,7 +371,6 @@ class App(QWidget):
 
         self.variable_tab.setLayout(layout)
 
-
     def add_role_dict_input(self):
         row = len(self.role_dict_inputs)
         key_input = QLineEdit(self)
@@ -330,20 +381,6 @@ class App(QWidget):
         self.role_dict_inputs.append((key_input, value_input))
         self.role_dict_grid.addWidget(key_input, row // 3, 2 * (row % 3))  # 键
         self.role_dict_grid.addWidget(value_input, row // 3, 2 * (row % 3) + 1)  # 值
-
-    def add_role_seq_input(self):
-        row = len(self.role_seq_inputs)
-        key_input = QLineEdit(self)
-        key_input.setPlaceholderText("输入角色坐标键")
-        x_input = QLineEdit(self)
-        x_input.setPlaceholderText("输入 X 坐标")
-        y_input = QLineEdit(self)
-        y_input.setPlaceholderText("输入 Y 坐标")
-
-        self.role_seq_inputs.append((key_input, x_input, y_input))
-        self.role_seq_grid.addWidget(key_input, row // 3, 3 * (row % 3))  # 键
-        self.role_seq_grid.addWidget(x_input, row // 3, 3 * (row % 3) + 1)  # X坐标
-        self.role_seq_grid.addWidget(y_input, row // 3, 3 * (row % 3) + 2)  # Y坐标
 
     def modify_variable(self):
         shared_file_path = 'shared_variables.py'
@@ -435,7 +472,6 @@ class App(QWidget):
             msg = f"角色顺序坐标已修改为 '{role_seq_coord}'"
             print(msg)
             self.role_seq_output_text.append(msg)
-
 
         except Exception as e:
             QMessageBox.critical(self, "错误", f"修改角色顺序坐标时出错：\n{str(e)}")

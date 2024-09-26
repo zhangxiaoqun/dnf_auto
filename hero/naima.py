@@ -2,6 +2,7 @@ import time
 import math
 import cv2
 import pytesseract
+from game_control import GameControl
 import shared_variables as sv  # 引入共享变量模块
 def calculate_center(box):# 计算矩形框的底边中心点坐标
     return ((box[0] + box[2]) / 2, box[3])
@@ -84,8 +85,7 @@ class Naima:
         import os
         import json
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # file_path = os.path.join(current_dir, "naima.json")
-        file_path = os.path.join(current_dir, sv.skill_name_path)
+        file_path = os.path.join(current_dir, "hero_skill_name/naima.json")
         print(file_path)
         with open(file_path, 'r', encoding='utf-8') as file:
             self.dict = json.load(file)  # 解析 JSON 文件
@@ -95,7 +95,7 @@ class Naima:
     def control(self,hero_pos, image, boxs, MapNumber):
         if self.pre_room_num!=MapNumber:
             wait = 0.1
-            if MapNumber == 0:  
+            if MapNumber == 0:
                 self.ctrl.reset()
                 time.sleep(wait)
                 self.skill("勇气祝福")
@@ -103,26 +103,19 @@ class Naima:
                 self.ctrl.move(335)
                 time.sleep(0.3)
                 self.skill("领悟之雷")
-                # self.skill("圈圈")
-                # time.sleep(0.5)
-                # self.skill("沐天之光")
             elif MapNumber == 1:
                 time.sleep(wait)
-                self.ctrl.move(295)
+                self.ctrl.move(225)
                 time.sleep(0.4)
-                self.skill("光明惩戒")
-                # self.skill("光芒烬盾")
+                self.ctrl.move(315)
+                time.sleep(0.2)
+                self.skill("光明之杖")
                 time.sleep(1)
-                # self.skill("领悟之雷")
-                # self.skill("光芒烬盾")
-                # time.sleep(0.5)
-                # self.skill("沐天之光")
             elif MapNumber == 2:
                 time.sleep(wait)
                 self.ctrl.move(340)
-                time.sleep(0.6)
+                time.sleep(0.3)
                 self.skill("光芒烬盾")
-                # self.skill("光明惩戒")
             elif MapNumber == 3:
                 time.sleep(wait)
                 self.ctrl.move(345)
@@ -142,7 +135,6 @@ class Naima:
             elif MapNumber == 5:
                 time.sleep(wait)
                 self.ctrl.move(180)
-                # self.ctrl.move(240)
                 time.sleep(0.4)
                 self.skill("觉醒")
                 time.sleep(0.4)
@@ -176,12 +168,12 @@ class Naima:
                 time.sleep(0.4)
                 self.ctrl.move(0)
                 self.skill("光芒烬盾")
-                # time.sleep(0.7)
-                # self.skill("沐天之光")
                 time.sleep(0.8)
                 self.skill("光明之杖")
             self.pre_room_num = MapNumber
-            return 0
+            return 0  # 更新房间编号并返回
+
+
         self.pre_room_num = MapNumber
         monster = boxs[boxs[:,5]<=2][:,:4]
         close_monster,distance = find_close_point_to_box(monster,hero_pos)
@@ -198,9 +190,3 @@ class Naima:
         self.last_angle = angle
 
         return angle
-                
-                
-                    
-
-        
-        

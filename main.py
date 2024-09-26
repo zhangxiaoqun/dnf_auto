@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import cv2
 import numpy as np
 
@@ -48,7 +49,7 @@ if __name__ == '__main__':
     # control = GameControl(client, os.path.join(current_dir, "./skill.json"))
     # control = GameControl(client, os.path.join(current_dir, "./skill_biaozhun_xiaomi.json"))
     # control = GameControl(client, os.path.join(current_dir, "skill_jichu_huawei.json"))
-    control = GameControl(client, os.path.join(current_dir, "hero/hero_skill/test_skill.json"))
+    control = GameControl(client, os.path.join(current_dir, "hero/hero_skill/common_skill.json"))
 
     # 创建 GameAction 实例以处理游戏中的操作
     action = GameAction(control, infer_queue)

@@ -68,4 +68,5 @@ class ScrcpyADB:
         else:
             print("No frame available to save.")
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    ScrcpyADB()

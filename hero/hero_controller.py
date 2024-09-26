@@ -101,7 +101,7 @@ def are_angles_on_same_side_of_y(angle1, angle2):  # 规范化角度
 
 # 方位与角度的对应关系
 directions = {
-    0: "右",
+    1: "右",
     45: "右上",
     90: "上",
     135: "左上",
@@ -117,19 +117,18 @@ class HeroController:
         self.pre_room_num = -1
         self.last_angle = 0
 
-        # self.load_skills(self.skill_name_path[sv.hero_num])
 
     def load_skills(self):
         # 技能配置
         self.skill_name_path = {
-            1: "hero/hero_skill_name/jianhun.json",
-            2: "hero/hero_skill_name/modao.json",
-            3: "hero/hero_skill_name/naima.json",
-            4: "hero/hero_skill_name/naima.json",
-            5: "hero/hero_skill_name/kuanzhanshi.json",
-            6: "hero/hero_skill_name/jianzong.json",
-            7: "hero/hero_skill_name/jianhao.json",
-            8: "hero/hero_skill_name/sanda.json",
+            1: "hero_skill_name/jianhun.json",
+            2: "hero_skill_name/modao.json",
+            3: "hero_skill_name/naima.json",
+            4: "hero_skill_name/naima.json",
+            5: "hero_skill_name/kuanzhanshi.json",
+            6: "hero_skill_name/jianzong.json",
+            7: "hero_skill_name/jianhao.json",
+            8: "hero_skill_name/sanda.json",
         }
         """加载技能配置"""
         print(self.skill_name_path[sv.hero_num])
@@ -179,9 +178,11 @@ class HeroController:
                 self.skill("领悟之雷")
             elif MapNumber == 1:
                 time.sleep(wait)
-                self.ctrl.move(295)
+                self.ctrl.move(225)
                 time.sleep(0.4)
-                self.skill("光明惩戒")
+                self.ctrl.move(315)
+                time.sleep(0.2)
+                self.skill("光明之杖")
                 time.sleep(1)
             elif MapNumber == 2:
                 time.sleep(wait)
@@ -261,10 +262,12 @@ class HeroController:
                 self.skill("破军升龙击")
             elif MapNumber == 1:
                 time.sleep(wait)
-                self.ctrl.move(295)
+                self.ctrl.move(225)
                 time.sleep(0.4)
+                self.ctrl.move(315)
+                time.sleep(0.2)
                 self.skill("幻影剑舞")
-                time.sleep(2.5)
+                time.sleep(3)
             elif MapNumber == 2:
                 time.sleep(wait)
                 self.ctrl.move(340)
@@ -290,6 +293,10 @@ class HeroController:
                 time.sleep(wait)
                 self.ctrl.move(180)
                 time.sleep(0.4)
+                self.ctrl.move(335)
+                time.sleep(0.4)
+                self.ctrl.move(180)
+                time.sleep(0.1)
                 self.skill("觉醒")
                 time.sleep(0.4)
                 self.skill("觉醒")
@@ -305,7 +312,7 @@ class HeroController:
                 time.sleep(0.4)
                 self.ctrl.move(0)
                 self.skill("流心-跃")
-                time.sleep(3)
+                time.sleep(0.7)
                 self.skill("拔刀斩")
             elif MapNumber == 8:
                 time.sleep(wait)
@@ -319,9 +326,9 @@ class HeroController:
             elif MapNumber == 9:
                 time.sleep(wait)
                 self.ctrl.move(330)
-                time.sleep(0.4)
-                self.ctrl.move(0)
-                self.skill("拔刀斩")
+                # time.sleep(0.4)
+                # self.ctrl.move(0)
+                # self.skill("拔刀斩")
                 time.sleep(0.4)
                 self.skill("幻影剑舞")
             self.pre_room_num = MapNumber
@@ -428,11 +435,13 @@ class HeroController:
                 time.sleep(0.8)
                 self.ctrl.move(335)
                 time.sleep(0.3)
-                self.skill("嗜魂封魔斩")
+                self.skill("嗜魂封魔斩", t=2)
             elif MapNumber == 1:
                 time.sleep(wait)
-                self.ctrl.move(295)
+                self.ctrl.move(225)
                 time.sleep(0.4)
+                self.ctrl.move(315)
+                time.sleep(0.2)
                 self.skill("血剑")
                 time.sleep(1)
             elif MapNumber == 2:
@@ -443,7 +452,7 @@ class HeroController:
             elif MapNumber == 3:
                 time.sleep(wait)
                 self.ctrl.move(345)
-                time.sleep(0.5)
+                # time.sleep(0.5)
                 self.skill("崩山地裂斩")
                 time.sleep(1.2)
                 self.skill("后跳")
@@ -456,10 +465,13 @@ class HeroController:
                 self.ctrl.move(1)
                 time.sleep(0.05)
                 self.skill("愤怒狂刃")
+                time.sleep(2.3)
+                self.skill("觉醒")
             elif MapNumber == 5:
                 time.sleep(wait)
-                self.ctrl.move(180)
-                time.sleep(0.4)
+                # self.ctrl.move(180)
+                self.ctrl.move(225)
+                time.sleep(0.2)
                 self.skill("觉醒")
                 time.sleep(0.4)
                 self.skill("觉醒")
@@ -492,8 +504,6 @@ class HeroController:
                 self.skill("怒气爆发")
             self.pre_room_num = MapNumber
             return 0  # 更新房间编号并返回
-
-        # 这里添加其他英雄 0 的具体控制逻辑
         return self.perform_common_actions(hero_pos, boxs)
 
     # 剑宗
@@ -513,8 +523,10 @@ class HeroController:
                 self.skill("破军旋舞斩", t=0.5)
             elif MapNumber == 1:
                 time.sleep(wait)
-                self.ctrl.move(295)
+                self.ctrl.move(225)
                 time.sleep(0.4)
+                self.ctrl.move(315)
+                time.sleep(0.2)
                 self.skill("瞬影三连斩")
                 # self.ctrl.click(1717, 857, t=1.2)
                 time.sleep(1)
@@ -560,17 +572,11 @@ class HeroController:
                 time.sleep(0.4)
                 self.ctrl.move(0)
                 self.skill("雷鸣千军破")
-                # time.sleep(1)
-                # self.skill("沐天之光")
             elif MapNumber == 8:
                 time.sleep(wait)
                 self.ctrl.move(340)
                 time.sleep(0.4)
                 self.skill("瞬影三连斩")
-                # time.sleep(0.5)
-                # self.ctrl.move(1)
-                # time.sleep(0.5)
-                # self.skill("光明惩戒", t=1.2)
             elif MapNumber == 9:
                 time.sleep(wait)
                 self.ctrl.move(330)
@@ -578,8 +584,6 @@ class HeroController:
                 self.skill("恶既斩", t=1)
             self.pre_room_num = MapNumber
             return 0  # 更新房间编号并返回
-
-        # 这里添加其他英雄 0 的具体控制逻辑
         return self.perform_common_actions(hero_pos, boxs)
 
     # 剑豪
@@ -593,12 +597,18 @@ class HeroController:
                 self.skill("五气朝元")
                 time.sleep(1.2)
                 self.ctrl.move(335)
-                time.sleep(0.3)
-                self.skill("游龙掌")
+                # time.sleep(0.3)
+                # self.skill("游龙掌")
+                time.sleep(0.3 )
+                self.skill("四象引")
+                time.sleep(1)
+                self.skill("樱花落")
             elif MapNumber == 1:
                 time.sleep(wait)
-                self.ctrl.move(295)
+                self.ctrl.move(225)
                 time.sleep(0.4)
+                self.ctrl.move(315)
+                time.sleep(0.2)
                 self.skill("回天璇鸣剑")
                 time.sleep(1)
             elif MapNumber == 2:
@@ -608,9 +618,14 @@ class HeroController:
                 self.skill("樱花落")
             elif MapNumber == 3:
                 time.sleep(wait)
-                self.ctrl.move(345)
-                time.sleep(0.1)
-                self.skill("湮灭掌")
+                # self.ctrl.move(345)
+                self.ctrl.move(315)
+                time.sleep(0.3)
+                self.skill("花舞千魂")
+                time.sleep(0.3)
+                self.skill("花舞千魂")
+                time.sleep(0.3)
+                self.skill("花舞千魂")
             elif MapNumber == 4:
                 time.sleep(wait)
                 self.ctrl.move(145)
@@ -624,10 +639,7 @@ class HeroController:
                 self.skill("樱花落")
             elif MapNumber == 5:
                 time.sleep(wait)
-                # self.ctrl.move(180)
                 self.ctrl.move(225)
-                # time.sleep(0.1)
-                # self.skill("幻剑术")
                 time.sleep(0.2)
                 self.skill("觉醒")
                 time.sleep(0.4)
@@ -641,26 +653,27 @@ class HeroController:
             elif MapNumber == 7:
                 time.sleep(wait)
                 self.ctrl.move(335)
-                time.sleep(0.3 )
-                self.skill("四象引")
+                time.sleep(0.6)
+                self.skill("回天璇鸣剑")
                 time.sleep(1)
                 self.skill("樱花落")
             elif MapNumber == 8:
                 time.sleep(wait)
                 self.ctrl.move(340)
-                time.sleep(0.4)
-                self.skill("湮灭掌")
+                time.sleep(0.2)
+                self.skill("乱花葬")
                 time.sleep(0.5)
                 self.ctrl.move(1)
                 time.sleep(0.5)
                 self.skill("樱花落")
+                time.sleep(3)
             elif MapNumber == 9:
                 time.sleep(wait)
                 self.ctrl.move(330)
                 time.sleep(0.4)
                 self.ctrl.move(0)
-                self.skill("回天璇鸣剑")
-                time.sleep(1.5)
+                self.skill("湮灭掌")
+                time.sleep(0.7)
                 self.skill("花舞千魂")
                 time.sleep(0.3)
                 self.skill("花舞千魂")
@@ -668,8 +681,6 @@ class HeroController:
                 self.skill("花舞千魂")
             self.pre_room_num = MapNumber
             return 0  # 更新房间编号并返回
-
-        # 这里添加其他英雄 0 的具体控制逻辑
         return self.perform_common_actions(hero_pos, boxs)
 
     # 散打
@@ -700,8 +711,10 @@ class HeroController:
                 time.sleep(0.3)
             elif MapNumber == 1:
                 time.sleep(wait)
-                self.ctrl.move(295)
+                self.ctrl.move(225)
                 time.sleep(0.4)
+                self.ctrl.move(315)
+                time.sleep(0.2)
                 self.skill("连环踢")
                 time.sleep(1)
             elif MapNumber == 2:
@@ -774,8 +787,6 @@ class HeroController:
                 self.skill("截踢")
             self.pre_room_num = MapNumber
             return 0  # 更新房间编号并返回
-
-        # 这里添加其他英雄 1 的具体控制逻辑
         return self.perform_common_actions(hero_pos, boxs)
 
 
