@@ -128,7 +128,8 @@ class HeroController:
             5: "hero_skill_name/kuanzhanshi.json",
             6: "hero_skill_name/jianzong.json",
             7: "hero_skill_name/jianhao.json",
-            8: "hero_skill_name/sanda.json",
+            8: "hero_skill_name/qigong.json",
+            9: "hero_skill_name/sanda.json"
         }
         """加载技能配置"""
         print(self.skill_name_path[sv.hero_num])
@@ -520,7 +521,7 @@ class HeroController:
                 time.sleep(1.2)
                 self.ctrl.move(335)
                 time.sleep(0.3)
-                self.skill("破军旋舞斩", t=0.5)
+                self.skill("破军旋舞斩", t=0.2)
             elif MapNumber == 1:
                 time.sleep(wait)
                 self.ctrl.move(225)
@@ -548,7 +549,7 @@ class HeroController:
                 time.sleep(0.65)
                 self.ctrl.move(1)
                 time.sleep(0.05)
-                self.skill("瞬影三连斩")
+                self.skill("魔剑奥义")
                 time.sleep(0.5)
                 self.ctrl.move(1)
                 time.sleep(0.2)
@@ -581,7 +582,7 @@ class HeroController:
                 time.sleep(wait)
                 self.ctrl.move(330)
                 time.sleep(0.4)
-                self.skill("恶既斩", t=1)
+                self.skill("恶既斩", t=0.3)
             self.pre_room_num = MapNumber
             return 0  # 更新房间编号并返回
         return self.perform_common_actions(hero_pos, boxs)
@@ -683,9 +684,100 @@ class HeroController:
             return 0  # 更新房间编号并返回
         return self.perform_common_actions(hero_pos, boxs)
 
-    # 散打
+    # 气功
     def control_hero_8(self, hero_pos, image, boxs, MapNumber):
-        """英雄 7 的控制逻辑"""
+        """英雄 8 的控制逻辑"""
+        if self.pre_room_num != MapNumber:
+            wait = 0.1
+            if MapNumber == 0:
+                self.ctrl.reset()
+                time.sleep(wait)
+                self.skill("念气环绕")
+                time.sleep(0.5)
+                self.skill("光之兵刃")
+                time.sleep(0.5)
+                self.skill("雷龙出海")
+            elif MapNumber == 1:
+                time.sleep(wait)
+                self.ctrl.move(315)
+                time.sleep(0.4)
+                self.skill("狮子吼")
+            elif MapNumber == 2:
+                time.sleep(wait)
+                self.ctrl.move(1)
+                time.sleep(0.6)
+                self.skill("念气罩")
+                time.sleep(0.3)
+                self.skill("念气罩")
+            elif MapNumber == 3:
+                time.sleep(wait)
+                self.ctrl.move(1)
+                time.sleep(0.5)
+                self.skill("螺旋念气场")
+            elif MapNumber == 4:
+                time.sleep(wait)
+                self.ctrl.move(145)
+                time.sleep(0.65)
+                self.ctrl.move(1)
+                time.sleep(0.05)
+                self.skill("念气波", t=0.5)
+                time.sleep(0.3)
+                self.skill("气玉弹")
+            elif MapNumber == 5:
+                time.sleep(wait)
+                self.ctrl.move(225)
+                time.sleep(1.2)
+                self.ctrl.move(1)
+                time.sleep(1)
+                self.skill("念气罩")
+                time.sleep(0.2)
+                self.skill("狮子吼")
+                time.sleep(0.2)
+                self.skill("觉醒")
+                time.sleep(1)
+                self.skill("觉醒")
+                time.sleep(0.3)
+                self.skill("觉醒")
+                time.sleep(0.3)
+                self.skill("觉醒")
+                time.sleep(0.3)
+                self.skill("觉醒")
+                time.sleep(0.3)
+                self.skill("觉醒")
+            elif MapNumber == 6:
+                # self.ctrl.move(335)
+                # time.sleep(1)
+                None
+            elif MapNumber == 7:
+                time.sleep(wait)
+                self.ctrl.move(335)
+                time.sleep(0.6)
+                self.skill("念气波", t=0.5)
+                time.sleep(0.3)
+                self.skill("气玉弹")
+            elif MapNumber == 8:
+                time.sleep(wait)
+                self.ctrl.move(340)
+                time.sleep(1)
+                self.skill("狮子吼")
+                time.sleep(0.5)
+            elif MapNumber == 9:
+                time.sleep(wait)
+                self.ctrl.move(330)
+                time.sleep(0.6)
+                self.ctrl.move(0)
+                self.skill("螺旋念气场")
+                time.sleep(0.6)
+                self.skill("念气罩")
+                time.sleep(0.1)
+                self.skill("念气罩")
+            self.pre_room_num = MapNumber
+            return 0  # 更新房间编号并返回
+        return self.perform_common_actions(hero_pos, boxs)
+
+    # 散打
+    def control_hero_9(self, hero_pos, image, boxs, MapNumber):
+        """英雄 8 的控制逻辑"""
         if self.pre_room_num != MapNumber:
             wait = 0.1
             if MapNumber == 0:

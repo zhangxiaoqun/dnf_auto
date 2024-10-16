@@ -43,6 +43,8 @@ if __name__ == '__main__':
     # 初始化 YOLOv5 模型用于对象检测
     yolo = YOLOv5(os.path.join(current_dir, "./utils/dnfm.onnx"), image_queue, infer_queue, show_queue)
     # yolo = YOLOv5(os.path.join(current_dir, "./utils/df.onnx"), image_queue, infer_queue, show_queue)
+    # yolo = YOLOv5(os.path.join(current_dir, "./utils/best.onnx"), image_queue, infer_queue, show_queue)
+    # yolo = YOLOv5(os.path.join(current_dir, "./utils/dnf_sim.trt"), image_queue, infer_queue, show_queue)
     # yolo = YOLOv5(os.path.join(current_dir, "./utils/dnf_sim.trt"), image_queue, infer_queue, show_queue)
 
     # 使用指定的技能 JSON 配置初始化 GameControl
@@ -54,6 +56,8 @@ if __name__ == '__main__':
     # 创建 GameAction 实例以处理游戏中的操作
     action = GameAction(control, infer_queue)
     while True:         # 在主循环中根据需要重新初始化 GameControl
+        if sv.hero_num == 9:
+            break
         if show_queue.empty():  # 如果显示队列为空
             time.sleep(0.001)   # 等待微秒
             continue
@@ -130,4 +134,3 @@ if __name__ == '__main__':
         cv2.setMouseCallback("Image", on_mouse) # 设置鼠标回调
         update_display()  # 更新显示
         cv2.waitKey(1)  # 等待按键事件
-
