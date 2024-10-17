@@ -2,14 +2,15 @@ import requests
 import time
 
 
-def send_miao_reminder(text):
+def send_miao_reminder(mm_id, text):
     """
     发送喵提醒
 
     :param id: str，喵码
     :param text: str，提醒附加内容
     """
-    mm_id = 'tz10qj1'
+    # mm_id = 'tz10qj1'
+    # mm_id = 'tXznvTO'
     ts = str(time.time())  # 获取时间戳
     type = 'json'  # 返回内容格式
     request_url = "http://miaotixing.com/trigger?"

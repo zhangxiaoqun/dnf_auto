@@ -413,7 +413,7 @@ class GameAction:
             # else:
             print("等待时间超时，返回城镇")
             # 微信公众号提醒
-            send_miao_reminder("等待时间超时，返回城镇")
+            send_miao_reminder(sv.mm_id, "等待时间超时，返回城镇")
             # send_email_with_attachment("DNF刷图信息", "等待时间超时，返回城镇", ["current_screen_img.jpg"])
             # self.stop_event = True
             self.detect_retry = False
@@ -854,7 +854,7 @@ class GameAction:
                     role_name = f"我是英雄：{sv.role_dic[sv.hero_num]},第{sv.hero_num}出场"
                     print(role_name)
                     # 微信公众号提醒
-                    send_miao_reminder(role_name)
+                    send_miao_reminder(sv.mm_id, role_name)
                     self.timing_time = None  # 重置时间
                     # 启动脚本
                     self.stop_event = False
@@ -865,7 +865,10 @@ class GameAction:
                     tracker.stop()
                     time_consuming = tracker.calculate_duration(subtract_seconds=32)
                     message = f"英雄名称: {sv.role_dic[sv.hero_num]},第{sv.battle_num}轮战斗，战斗耗时:{time_consuming}"
-                    send_miao_reminder(message)
+                    send_miao_reminder(sv.mm_id, message)
+                    if sv.hero_num >= 9:
+                        send_miao_reminder(sv.yh_mm_id, message)
+                        send_miao_reminder(sv.mm_id, message)
                     # send_email_with_attachment("DNF刷图信息", message, ["current_screen_img.jpg"])
                     # 重置时间
                     tracker.reset()
