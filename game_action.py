@@ -436,6 +436,25 @@ class GameAction:
             self.timing_time = None
             self.stop_event = False
 
+    def switch_user(self):
+        # 点击设置
+        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
+        # 点击切换账号
+        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/switch_user_icon.jpg", t=2)
+        # 点击确认
+        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/queren.jpg", t=2)
+        # 点击同意
+        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/tongyi.jpg", t=2)
+        # 点击微信登录
+        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/wx_icon.jpg", t=2)
+        take_screenshot(filename="wechat_qr_code.jpg")
+        send_email_with_attachment("DNF微信登录二维码", "请扫描二维码", ["wechat_qr_code.jpg"])
+        while True:
+            take_screenshot()
+            if find_best_match_2(sv.current_screen_img, r"./img/switch/start_game_1.jpg") is not None:
+                click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/start_game_1.jpg", t=2)
+                click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/start_game_2.jpg", t=2)
+                break
 
     def check_hero_pl(self):
         # if find_best_match_2(sv.current_screen_img, r"./img/pl_num_file/pl0.jpg") is not None:
@@ -542,6 +561,17 @@ class GameAction:
             # self.ctrl.slide(208, 524, "up", distance=400)
             # time.sleep(6)
             self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
+            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+            time.sleep(12)
+            # 加载技能模板
+            self.control_attack.load_skills()
+        elif sv.hero_num == 9:
+            self.switch_user()
+            time.sleep(12)
+            # 左上角选角
+            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
+            print("点击选角")
+            self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
             time.sleep(12)
             # 加载技能模板

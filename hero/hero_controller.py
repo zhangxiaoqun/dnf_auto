@@ -129,7 +129,12 @@ class HeroController:
             6: "hero_skill_name/jianzong.json",
             7: "hero_skill_name/jianhao.json",
             8: "hero_skill_name/qigong.json",
-            9: "hero_skill_name/sanda.json"
+            20: "hero_skill_name/sanda.json",
+
+            #元昊
+            9: "hero_skill_name/kuanzhanshi.json",
+            10: "hero_skill_name/jianhao.json",
+            11: "hero_skill_name/xiuluo.json"
         }
         """加载技能配置"""
         print(self.skill_name_path[sv.hero_num])
@@ -160,6 +165,12 @@ class HeroController:
             return self.control_hero_7(hero_pos, image, boxs, MapNumber)
         elif hero_num == 8:
             return self.control_hero_8(hero_pos, image, boxs, MapNumber)
+        elif hero_num == 9:
+            return self.control_hero_5(hero_pos, image, boxs, MapNumber)
+        elif hero_num == 10:
+            return self.control_hero_7(hero_pos, image, boxs, MapNumber)
+        elif hero_num == 11:
+            return self.control_hero_10(hero_pos, image, boxs, MapNumber)
         else:
             print("未定义的英雄编号")
             return None
@@ -879,6 +890,94 @@ class HeroController:
                 self.skill("截踢")
             self.pre_room_num = MapNumber
             return 0  # 更新房间编号并返回
+        return self.perform_common_actions(hero_pos, boxs)
+
+    # 阿修罗
+    def control_hero_10(self, hero_pos, image, boxs, MapNumber):
+        """英雄 1 的控制逻辑"""
+        if self.pre_room_num != MapNumber:
+            wait = 0.1
+            if MapNumber == 0:
+                self.ctrl.reset()
+                time.sleep(wait)
+                self.skill("破击兵刃")
+                time.sleep(4)
+                self.skill("破军升龙击")
+            elif MapNumber == 1:
+                time.sleep(wait)
+                self.ctrl.move(225)
+                time.sleep(0.4)
+                self.ctrl.move(315)
+                time.sleep(0.2)
+                self.skill("幻影剑舞")
+                time.sleep(3)
+            elif MapNumber == 2:
+                time.sleep(wait)
+                self.ctrl.move(340)
+                time.sleep(0.6)
+                self.skill("流心-连")
+            elif MapNumber == 3:
+                time.sleep(wait)
+                self.ctrl.move(345)
+                time.sleep(0.5)
+                self.skill("拔刀斩")
+            elif MapNumber == 4:
+                time.sleep(wait)
+                self.ctrl.move(145)
+                time.sleep(0.65)
+                self.ctrl.move(1)
+                time.sleep(0.05)
+                self.skill("破军升龙击")
+                time.sleep(0.5)
+                self.ctrl.move(1)
+                time.sleep(0.2)
+                self.skill("破军")
+            elif MapNumber == 5:
+                time.sleep(wait)
+                self.ctrl.move(180)
+                time.sleep(0.4)
+                self.ctrl.move(335)
+                time.sleep(0.4)
+                self.ctrl.move(180)
+                time.sleep(0.1)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+                time.sleep(0.4)
+                self.skill("觉醒")
+            elif MapNumber == 6:
+                None
+            elif MapNumber == 7:
+                time.sleep(wait)
+                self.ctrl.move(335)
+                time.sleep(0.4)
+                self.ctrl.move(0)
+                self.skill("流心-跃")
+                time.sleep(0.7)
+                self.skill("拔刀斩")
+            elif MapNumber == 8:
+                time.sleep(wait)
+                self.ctrl.move(340)
+                time.sleep(0.4)
+                self.skill("流心-连")
+                time.sleep(0.5)
+                self.ctrl.move(1)
+                time.sleep(0.5)
+                self.skill("破军升龙击")
+            elif MapNumber == 9:
+                time.sleep(wait)
+                self.ctrl.move(330)
+                # time.sleep(0.4)
+                # self.ctrl.move(0)
+                # self.skill("拔刀斩")
+                time.sleep(0.4)
+                self.skill("幻影剑舞")
+            self.pre_room_num = MapNumber
+            return 0  # 更新房间编号并返回
+
+        # 这里添加其他英雄 2 的具体控制逻辑
         return self.perform_common_actions(hero_pos, boxs)
 
 
