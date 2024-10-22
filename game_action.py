@@ -14,6 +14,7 @@ from end_time import TimeTracker
 import random
 # from test import take_screenshot_async
 from send.send_email import send_email_with_attachment
+import sys
 
 def click_img_coordinate(control, current_screen_img, image_path, gray_convert=1, t=1):
     take_screenshot()
@@ -500,10 +501,10 @@ class GameAction:
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
             print("点击选角")
             self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
-            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-            time.sleep(12)
-            # 加载技能模板
-            self.control_attack.load_skills()
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+            # time.sleep(12)
+            # # 加载技能模板
+            # self.control_attack.load_skills()
         # 大雷给奶一口
         elif sv.hero_num == 3:
             # switch_hero(self.ctrl, heros["大雷给奶一口"])
@@ -512,10 +513,10 @@ class GameAction:
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
             print("点击选角")
             self.ctrl.click(role_sx["role_index3"][0], role_sx["role_index3"][1])
-            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-            time.sleep(12)
-            # 加载技能模板
-            self.control_attack.load_skills()
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+            # time.sleep(12)
+            # # 加载技能模板
+            # self.control_attack.load_skills()
         # 奶你
         elif sv.hero_num == 4:
             time.sleep(12)
@@ -524,10 +525,10 @@ class GameAction:
             print("点击选角")
             time.sleep(4)
             self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-            time.sleep(12)
-            # 加载技能模板
-            self.control_attack.load_skills()
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+            # time.sleep(12)
+            # # 加载技能模板
+            # self.control_attack.load_skills()
         # 大雷是啥子
         elif sv.hero_num == 5:
             time.sleep(12)
@@ -535,10 +536,10 @@ class GameAction:
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
             print("点击选角")
             self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-            time.sleep(12)
-            # 加载技能模板
-            self.control_attack.load_skills()
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+            # time.sleep(12)
+            # # 加载技能模板
+            # self.control_attack.load_skills()
 
         # 剑宗
         elif sv.hero_num == 6:
@@ -550,10 +551,10 @@ class GameAction:
             # self.ctrl.slide(208, 524, "up", distance=400)
             # time.sleep(6)
             self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-            time.sleep(12)
-            # 加载技能模板
-            self.control_attack.load_skills()
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+            # time.sleep(12)
+            # # 加载技能模板
+            # self.control_attack.load_skills()
 
         # 剑豪
         elif sv.hero_num == 7:
@@ -565,10 +566,10 @@ class GameAction:
             # self.ctrl.slide(208, 524, "up", distance=400)
             # time.sleep(6)
             self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-            time.sleep(12)
-            # 加载技能模板
-            self.control_attack.load_skills()
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+            # time.sleep(12)
+            # # 加载技能模板
+            # self.control_attack.load_skills()
 
         # 踹你一脚气
         elif sv.hero_num == 8:
@@ -580,27 +581,33 @@ class GameAction:
             # self.ctrl.slide(208, 524, "up", distance=400)
             # time.sleep(6)
             self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-            time.sleep(12)
-            # 加载技能模板
-            self.control_attack.load_skills()
-
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+            # time.sleep(12)
+            # # 加载技能模板
+            # self.control_attack.load_skills()
 
         elif sv.hero_num == 9:
             self.switch_user()
             time.sleep(5)
             # 加载技能模板
-            self.control_attack.load_skills()
+            # self.control_attack.load_skills()
         elif sv.hero_num == 10:
             time.sleep(12)
             # 左上角选角
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
             print("点击选角")
             self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
-            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-            time.sleep(12)
-            # 加载技能模板
-            self.control_attack.load_skills()
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+            # time.sleep(12)
+            # # 加载技能模板
+            # self.control_attack.load_skills()
+        else:
+            sys.exit()
+
+        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+        time.sleep(12)
+        # 加载技能模板
+        self.control_attack.load_skills()
 
     def control(self):
         """
