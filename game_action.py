@@ -414,7 +414,7 @@ class GameAction:
             print("等待时间超时，返回城镇")
             # 微信公众号提醒
             send_miao_reminder(sv.mm_id, "等待时间超时，返回城镇")
-            # send_email_with_attachment("DNF刷图信息", "等待时间超时，返回城镇", ["current_screen_img.jpg"])
+            # send_email_with_attachment(sv.harlan_email, "DNF刷图信息", "等待时间超时，返回城镇", ["current_screen_img.jpg"])
             # self.stop_event = True
             self.detect_retry = False
             # self.detect_retry = True
@@ -438,23 +438,42 @@ class GameAction:
 
     def switch_user(self):
         # 点击设置
-        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
+        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/seeting.jpg", t=2)
+        # self.ctrl.click()
         # 点击切换账号
         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/switch_user_icon.jpg", t=2)
+        # self.ctrl.click()
         # 点击确认
         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/queren.jpg", t=2)
+        # self.ctrl.click()
         # 点击同意
+        time.sleep(2)
         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/tongyi.jpg", t=2)
         # 点击微信登录
         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/wx_icon.jpg", t=2)
+
         take_screenshot(filename="wechat_qr_code.jpg")
-        send_email_with_attachment("DNF微信登录二维码", "请扫描二维码", ["wechat_qr_code.jpg"])
+        send_email_with_attachment(sv.yh_email, "DNF微信登录二维码", "请扫描二维码", ["wechat_qr_code.jpg"])
+        # send_email_with_attachment(sv.harlan_email, "DNF微信登录二维码", "请扫描二维码", ["wechat_qr_code.jpg"])
         while True:
             take_screenshot()
+            time.sleep(5)
             if find_best_match_2(sv.current_screen_img, r"./img/switch/start_game_1.jpg") is not None:
                 click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/start_game_1.jpg", t=2)
+                time.sleep(10)
                 click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/start_game_2.jpg", t=2)
+                time.sleep(10)
                 break
+        while True:
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/X_1.jpg", t=2)
+            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/X_2.jpg", t=2)
+            if find_best_match_2(sv.current_screen_img, r"./img/switch/X_1.jpg") is None \
+                    and find_best_match_2(sv.current_screen_img, r"./img/switch/X_2.jpg") is None:
+                break
+            else:
+                click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/X_1.jpg", t=2)
+                click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/switch/X_2.jpg", t=2)
+
 
     def check_hero_pl(self):
         # if find_best_match_2(sv.current_screen_img, r"./img/pl_num_file/pl0.jpg") is not None:
@@ -565,8 +584,14 @@ class GameAction:
             time.sleep(12)
             # 加载技能模板
             self.control_attack.load_skills()
+
+
         elif sv.hero_num == 9:
             self.switch_user()
+            time.sleep(5)
+            # 加载技能模板
+            self.control_attack.load_skills()
+        elif sv.hero_num == 10:
             time.sleep(12)
             # 左上角选角
             click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
@@ -577,7 +602,6 @@ class GameAction:
             # 加载技能模板
             self.control_attack.load_skills()
 
-
     def control(self):
         """
         游戏控制的主逻辑。
@@ -587,8 +611,7 @@ class GameAction:
         hero_track.appendleft([0, 0])  # 初始英雄位置
         last_angle = 0  # 上一个角度
 
-
-
+        # self.switch_user()
         self.bwj()
         self.stop_event = False
         # # 重置时间
@@ -727,6 +750,15 @@ class GameAction:
                     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/zhuangbeixiuli1.jpg")
                     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/xiulizhuangbei.jpg")
                     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/close_xiuli.jpg")
+                # time.sleep(3)
+                # take_screenshot()
+                # if find_best_match_2(sv.current_screen_img, r"./img/underground_file/chaozhong.jpg") is not None:
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/chaozhong.jpg")
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/sell.jpg")
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/sell_2.jpg")
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/affirm.jpg")
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/X_beibao_icon.jpg")
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/return_icon.jpg")
                 heros = {"大雷给奶一口":r"./img/role/nai1.jpg", "别拽了俺tuo":r"./img/role/bie2.jpg", "大雷是啥子":r"./img/role/kuang3.jpg"}
                 # 选择其他地下城
                 # self.ctrl.click(2078, 240)
@@ -737,117 +769,6 @@ class GameAction:
                 time.sleep(3)
                 if find_best_match_2(sv.current_screen_img, r"./img/pl_num_file/pl0.jpg") is not None:
                     self.check_hero_pl()
-                    # if sv.hero_num == 9:
-                    #     break
-                # if find_best_match_2(sv.current_screen_img, r"./img/pl_num_file/pl0.jpg") is not None:
-                #     print("疲劳值为0，选择其他角色")
-                #     # 点击右上角X按钮
-                #     # self.ctrl.click(2053, 136)
-                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/X_icon.jpg")
-                #     print("点击右上角X按钮")
-                #     # 点击左上角返回
-                #     # self.ctrl.click(149, 37)
-                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/return_icon.jpg")
-                #     print("点击左上角返回按钮")
-                #     # 点击返回城镇
-                #     # self.ctrl.click(2064, 338)
-                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/dxc_fhcz.jpg")
-                #     print("点击返回城镇")
-                #     sv.hero_num = sv.hero_num + 1
-                #     # 角色顺序
-                #     role_sx = sv.role_seq_coord
-                #     # 魔道
-                #     if sv.hero_num == 2:
-                #         time.sleep(12)
-                #         # 左上角选角
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
-                #         print("点击选角")
-                #         self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-                #         time.sleep(12)
-                #         # 加载技能模板
-                #         self.control_attack.load_skills()
-                #     # 大雷给奶一口
-                #     elif sv.hero_num == 3:
-                #         # switch_hero(self.ctrl, heros["大雷给奶一口"])
-                #         time.sleep(12)
-                #         # 左上角选角
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
-                #         print("点击选角")
-                #         self.ctrl.click(role_sx["role_index3"][0], role_sx["role_index3"][1])
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-                #         time.sleep(12)
-                #         # 加载技能模板
-                #         self.control_attack.load_skills()
-                #     # 奶你
-                #     elif sv.hero_num == 4:
-                #         time.sleep(12)
-                #         # 左上角选角
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
-                #         print("点击选角")
-                #         time.sleep(4)
-                #         self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-                #         time.sleep(12)
-                #         # 加载技能模板
-                #         self.control_attack.load_skills()
-                #     # 大雷是啥子
-                #     elif sv.hero_num == 5:
-                #         time.sleep(12)
-                #         # 左上角选角
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
-                #         print("点击选角")
-                #         self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-                #         time.sleep(12)
-                #         # 加载技能模板
-                #         self.control_attack.load_skills()
-                #
-                #     # 剑宗
-                #     elif sv.hero_num == 6:
-                #         time.sleep(12)
-                #         # 左上角选角
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
-                #         print("点击选角")
-                #         # # 滑动角色
-                #         # self.ctrl.slide(208, 524, "up", distance=400)
-                #         # time.sleep(6)
-                #         self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-                #         time.sleep(12)
-                #         # 加载技能模板
-                #         self.control_attack.load_skills()
-                #
-                #     # 剑豪
-                #     elif sv.hero_num == 7:
-                #         time.sleep(12)
-                #         # 左上角选角
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
-                #         print("点击选角")
-                #         # # 滑动角色
-                #         # self.ctrl.slide(208, 524, "up", distance=400)
-                #         # time.sleep(6)
-                #         self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-                #         time.sleep(12)
-                #         # 加载技能模板
-                #         self.control_attack.load_skills()
-                #
-                #     # 踹你一脚气
-                #     elif sv.hero_num == 8:
-                #         time.sleep(12)
-                #         # 左上角选角
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
-                #         print("点击选角")
-                #         # 滑动角色
-                #         # self.ctrl.slide(208, 524, "up", distance=400)
-                #         # time.sleep(6)
-                #         self.ctrl.click(role_sx["role_index4"][0], role_sx["role_index4"][1])
-                #         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-                #         time.sleep(12)
-                #         # 加载技能模板
-                #         self.control_attack.load_skills()
-
                     # 修理装备
                     # repair_equipment_and_sell_equipment(self.ctrl)
                     self.bwj()
@@ -869,7 +790,7 @@ class GameAction:
                     if sv.hero_num >= 9:
                         send_miao_reminder(sv.yh_mm_id, message)
                         send_miao_reminder(sv.mm_id, message)
-                    # send_email_with_attachment("DNF刷图信息", message, ["current_screen_img.jpg"])
+                    # send_email_with_attachment(sv.harlan_email, "DNF刷图信息", message, ["current_screen_img.jpg"])
                     # 重置时间
                     tracker.reset()
                     time.sleep(1)  # 等待1秒
@@ -929,21 +850,20 @@ class GameAction:
                     time.sleep(1)
                     print("房间号6666")
                     self.room = self.room + 1
-            time.sleep(0.001)  # 等待微秒以防止高 CPU 占用
-        # if
-        # if find_best_match_2(image, r"祥瑞溪谷地图名") is not None:
-        #     if find_best_match_2(image, r"再次挑战") is not None:
-        #         time.sleep(3)
-        #         click_img_coordinate(self.ctrl, image, r"再次挑战")
-        #         time.sleep(3)
-        #         click_img_coordinate(self.ctrl, image, r"/img/underground_file/kuang.jpg")
-        #         time.sleep(3)
-        #         click_img_coordinate(self.ctrl, image, r"/img/underground_file/qr.jpg")
-        #         time.sleep(3)
-        # elif find_best_match_2(image, r"返回城镇") is not None:
-        #     click_img_coordinate(self.ctrl, image, r"/img/underground_file/dxc_fhcz.jpg")
-        #     time.sleep(5)
-        #     self.bwj()
+
+        if find_best_match_2(image, r"./img/underground_file/xrxg.jpg") is not None:
+            if find_best_match_2(image, r"再次挑战") is not None:
+                time.sleep(3)
+                click_img_coordinate(self.ctrl, image, r"再次挑战")
+                time.sleep(3)
+                click_img_coordinate(self.ctrl, image, r"/img/underground_file/kuang.jpg")
+                time.sleep(3)
+                click_img_coordinate(self.ctrl, image, r"/img/underground_file/qr.jpg")
+                time.sleep(3)
+        elif find_best_match_2(image, r"./img/underground_file/dxc_fhcz.jpg") is not None:
+            click_img_coordinate(self.ctrl, image, r"/img/underground_file/dxc_fhcz.jpg")
+            time.sleep(5)
+            self.bwj()
 
     def calculate_hero_pos(self, hero_track, boxs):
         """

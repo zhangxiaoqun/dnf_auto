@@ -56,8 +56,6 @@ if __name__ == '__main__':
     # 创建 GameAction 实例以处理游戏中的操作
     action = GameAction(control, infer_queue)
     while True:         # 在主循环中根据需要重新初始化 GameControl
-        if sv.hero_num == 9:
-            break
         if show_queue.empty():  # 如果显示队列为空
             time.sleep(0.001)   # 等待微秒
             continue
