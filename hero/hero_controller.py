@@ -148,29 +148,51 @@ class HeroController:
         self.ctrl.skill(self.dict[name], t)
         print("shifang:", name)
 
+    # def control(self, hero_pos, image, boxs, MapNumber):
+    #     """根据英雄编号选择控制逻辑"""
+    #     hero_num = sv.hero_num  # 从共享变量中获取英雄编号
+    #     if hero_num == 3 or hero_num == 4:
+    #         return self.control_hero_0(hero_pos, image, boxs, MapNumber)
+    #     elif hero_num == 1:
+    #         return self.control_hero_1(hero_pos, image, boxs, MapNumber)
+    #     elif hero_num == 2:
+    #         return self.control_hero_2(hero_pos, image, boxs, MapNumber)
+    #     elif hero_num == 5:
+    #         return self.control_hero_5(hero_pos, image, boxs, MapNumber)
+    #     elif hero_num == 6:
+    #         return self.control_hero_6(hero_pos, image, boxs, MapNumber)
+    #     elif hero_num == 7:
+    #         return self.control_hero_7(hero_pos, image, boxs, MapNumber)
+    #     elif hero_num == 8:
+    #         return self.control_hero_8(hero_pos, image, boxs, MapNumber)
+    #     elif hero_num == 9:
+    #         return self.control_hero_5(hero_pos, image, boxs, MapNumber)
+    #     elif hero_num == 10:
+    #         return self.control_hero_7(hero_pos, image, boxs, MapNumber)
+    #     elif hero_num == 11:
+    #         return self.control_hero_10(hero_pos, image, boxs, MapNumber)
+    #     else:
+    #         print("未定义的英雄编号")
+    #         return None
+
     def control(self, hero_pos, image, boxs, MapNumber):
         """根据英雄编号选择控制逻辑"""
         hero_num = sv.hero_num  # 从共享变量中获取英雄编号
-        if hero_num == 3 or hero_num == 4:
+        self.load_skills()
+        if "naima.json" in self.skill_name_path[hero_num]:
             return self.control_hero_0(hero_pos, image, boxs, MapNumber)
-        elif hero_num == 1:
+        elif "jianhun.json" in self.skill_name_path[hero_num]:
             return self.control_hero_1(hero_pos, image, boxs, MapNumber)
-        elif hero_num == 2:
+        elif "modao.json" in self.skill_name_path[hero_num]:
             return self.control_hero_2(hero_pos, image, boxs, MapNumber)
-        elif hero_num == 5:
+        elif "kuanzhanshi.json" in self.skill_name_path[hero_num]:
+            return self.control_hero_3(hero_pos, image, boxs, MapNumber)
+        elif "jianzong.json" in self.skill_name_path[hero_num]:
+            return self.control_hero_4(hero_pos, image, boxs, MapNumber)
+        elif "jianhao.json" in self.skill_name_path[hero_num]:
             return self.control_hero_5(hero_pos, image, boxs, MapNumber)
-        elif hero_num == 6:
+        elif "qigong.json" in self.skill_name_path[hero_num]:
             return self.control_hero_6(hero_pos, image, boxs, MapNumber)
-        elif hero_num == 7:
-            return self.control_hero_7(hero_pos, image, boxs, MapNumber)
-        elif hero_num == 8:
-            return self.control_hero_8(hero_pos, image, boxs, MapNumber)
-        elif hero_num == 9:
-            return self.control_hero_5(hero_pos, image, boxs, MapNumber)
-        elif hero_num == 10:
-            return self.control_hero_7(hero_pos, image, boxs, MapNumber)
-        elif hero_num == 11:
-            return self.control_hero_10(hero_pos, image, boxs, MapNumber)
         else:
             print("未定义的英雄编号")
             return None
@@ -436,7 +458,7 @@ class HeroController:
         return self.perform_common_actions(hero_pos, boxs)
 
     # 狂战士
-    def control_hero_5(self, hero_pos, image, boxs, MapNumber):
+    def control_hero_3(self, hero_pos, image, boxs, MapNumber):
         """英雄 5 的控制逻辑"""
         if self.pre_room_num != MapNumber:
             wait = 0.1
@@ -519,7 +541,7 @@ class HeroController:
         return self.perform_common_actions(hero_pos, boxs)
 
     # 剑宗
-    def control_hero_6(self, hero_pos, image, boxs, MapNumber):
+    def control_hero_4(self, hero_pos, image, boxs, MapNumber):
         """英雄 3 的控制逻辑"""
         if self.pre_room_num != MapNumber:
             wait = 0.1
@@ -599,7 +621,7 @@ class HeroController:
         return self.perform_common_actions(hero_pos, boxs)
 
     # 剑豪
-    def control_hero_7(self, hero_pos, image, boxs, MapNumber):
+    def control_hero_5(self, hero_pos, image, boxs, MapNumber):
         """英雄 1 的控制逻辑"""
         if self.pre_room_num != MapNumber:
             wait = 0.1
@@ -696,7 +718,7 @@ class HeroController:
         return self.perform_common_actions(hero_pos, boxs)
 
     # 气功
-    def control_hero_8(self, hero_pos, image, boxs, MapNumber):
+    def control_hero_6(self, hero_pos, image, boxs, MapNumber):
         """英雄 8 的控制逻辑"""
         if self.pre_room_num != MapNumber:
             wait = 0.1
@@ -787,7 +809,7 @@ class HeroController:
         return self.perform_common_actions(hero_pos, boxs)
 
     # 散打
-    def control_hero_9(self, hero_pos, image, boxs, MapNumber):
+    def control_hero_7(self, hero_pos, image, boxs, MapNumber):
         """英雄 8 的控制逻辑"""
         if self.pre_room_num != MapNumber:
             wait = 0.1
@@ -893,7 +915,7 @@ class HeroController:
         return self.perform_common_actions(hero_pos, boxs)
 
     # 阿修罗
-    def control_hero_10(self, hero_pos, image, boxs, MapNumber):
+    def control_hero_8(self, hero_pos, image, boxs, MapNumber):
         """英雄 1 的控制逻辑"""
         if self.pre_room_num != MapNumber:
             wait = 0.1
