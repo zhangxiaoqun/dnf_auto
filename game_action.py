@@ -393,6 +393,15 @@ class GameAction:
         time.sleep(1)
         print(f"英雄随机移动到角度: {random_angle}")
 
+    def open_pl(self):
+        click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/pl_jiahao.jpg", t=1)
+        take_screenshot()
+        if find_best_match_2(sv.current_screen_img, r"./img/underground_file/ranshao_pl_open.jpg") is not None:
+            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/ranshao_pl_open.jpg", t=1)
+            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/pl_X.jpg", t=2)
+        else:
+            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/pl_X.jpg", t=2)
+
     def out_time(self):
         # 超时就返回城镇
         if self.timing_time is None:
@@ -586,28 +595,30 @@ class GameAction:
             # # 加载技能模板
             # self.control_attack.load_skills()
 
-        elif sv.hero_num == 9:
-            self.switch_user()
-            time.sleep(5)
-            # 加载技能模板
-            # self.control_attack.load_skills()
-        elif sv.hero_num == 10:
-            time.sleep(12)
-            # 左上角选角
-            click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
-            print("点击选角")
-            self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
-            # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
-            # time.sleep(12)
-            # # 加载技能模板
-            # self.control_attack.load_skills()
+        # elif sv.hero_num == 9:
+        #     self.switch_user()
+        #     time.sleep(5)
+        #     # 加载技能模板
+        #     # self.control_attack.load_skills()
+        # elif sv.hero_num == 10:
+        #     time.sleep(12)
+        #     # 左上角选角
+        #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/xuanjiao.jpg", t=2)
+        #     print("点击选角")
+        #     self.ctrl.click(role_sx["role_index2"][0], role_sx["role_index2"][1])
+        #     # click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
+        #     # time.sleep(12)
+        #     # # 加载技能模板
+        #     # self.control_attack.load_skills()
         else:
             sys.exit()
-
         click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/role/start_game.jpg")
         time.sleep(12)
         # 加载技能模板
         self.control_attack.load_skills()
+        # # 开启燃烧PL
+        # if sv.hero_num > 3:
+        #     self.open_pl()
 
     def control(self):
         """
@@ -617,9 +628,13 @@ class GameAction:
         hero_track = deque()  # 英雄轨迹队列
         hero_track.appendleft([0, 0])  # 初始英雄位置
         last_angle = 0  # 上一个角度
+        # 开启燃烧PL
+        if sv.hero_num > 3:
+            self.open_pl()
 
         # self.switch_user()
         self.bwj()
+
         self.stop_event = False
         # # 重置时间
         self.timing_time = None
@@ -761,14 +776,13 @@ class GameAction:
                 # take_screenshot()
                 # if find_best_match_2(sv.current_screen_img, r"./img/underground_file/chaozhong.jpg") is not None:
                 #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/chaozhong.jpg")
-                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/sell.jpg")
-                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/sell_2.jpg")
-                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/affirm.jpg")
-                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/X_beibao_icon.jpg")
-                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/return_icon.jpg")
-                heros = {"大雷给奶一口":r"./img/role/nai1.jpg", "别拽了俺tuo":r"./img/role/bie2.jpg", "大雷是啥子":r"./img/role/kuang3.jpg"}
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/sell.jpg", t=2)
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/sell_2.jpg", t=2)
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/affirm.jpg", t=2)
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/affirm.jpg", t=2)
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/beibao/X_beibao_icon.jpg", t=2)
+                #     click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/return_icon.jpg", t=2)
                 # 选择其他地下城
-                # self.ctrl.click(2078, 240)
                 click_img_coordinate(self.ctrl, sv.current_screen_img, r"./img/underground_file/select_other_dxc.jpg")
                 time.sleep(3)
                 print("选择其他地下城")
@@ -818,15 +832,40 @@ class GameAction:
                     else:
                         pass
 
+                    # # 战斗开始
+                    # while True:
+                    #     take_screenshot()
+                    #     if find_best_match_2(sv.current_screen_img, r"img/underground_file/zdks.jpg") is not None:
+                    #         # 战斗开始
+                    #         self.ctrl.click(1934, 935)
+                    #         print("==============================")
+                    #         print("点击-战斗开始")
+                    #         print("==============================")
+                    #     else:
+                    #         break
                     # 战斗开始
                     while True:
                         take_screenshot()
                         if find_best_match_2(sv.current_screen_img, r"img/underground_file/zdks.jpg") is not None:
                             # 战斗开始
-                            self.ctrl.click(1934, 935)
                             print("==============================")
                             print("点击-战斗开始")
                             print("==============================")
+                            self.ctrl.click(1934, 935)
+                            if sv.hero_num > 3 and sv.pl_300_message_num <= 0:
+                                # 300 pl提示
+                                time.sleep(2)
+                                take_screenshot()
+                                print("布万加方法-选择地下城界面截图")
+                                time.sleep(2)
+                                if find_best_match_2(sv.current_screen_img,
+                                                     r"./img/underground_file/kuang.jpg") is not None:
+                                    click_img_coordinate(self.ctrl, sv.current_screen_img,
+                                                         r"./img/underground_file/kuang.jpg")
+                                    click_img_coordinate(self.ctrl, sv.current_screen_img,
+                                                         r"img/underground_file/qr.jpg")
+                                    sv.pl_300_message_num = sv.pl_300_message_num + 1
+                                    print("疲劳超过300提示")
                         else:
                             break
                 self.ctrl.move(0)

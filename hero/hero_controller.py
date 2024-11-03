@@ -137,7 +137,7 @@ class HeroController:
             11: "hero_skill_name/xiuluo.json"
         }
         """加载技能配置"""
-        print(self.skill_name_path[sv.hero_num])
+        # print(self.skill_name_path[sv.hero_num])
         current_dir = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(current_dir, self.skill_name_path[sv.hero_num])
         with open(file_path, 'r', encoding='utf-8') as file:
